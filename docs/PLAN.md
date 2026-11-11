@@ -123,3 +123,33 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Natija: **137 test yashil** (oldingi 83 + 54 yangi: auth API oqimi, OTP servis,
   SMS adapter, rol matritsasi, throttling), coverage **99%** (auth ≥85% gate bajarildi);
   live smoke Docker'da tekshirildi: register → verify-otp → me → logout to'liq oqim OK
+
+### Bosqich 4 — Asosiy biznes mantiq (domen) ✅
+- **Slot dvigateli** (`schedule/services/slots.py`): sof funksiya
+  `compute_day_slots` — plan qoidasiga ko'ra dvigatel `bookings`'ni bilmaydi,
+  band vaqtlar `(start, end)` juftliklari argument sifatida kiradi. Yarim ochiq
+  oraliq mantig'i `[start, end)` ("aynan tegish" kesishmaydi), 15 daqiqalik
+  panjara, tanaffus/band/o'tgan-vaqt filtrlari, moslashtiriladigan qadam
+- DB yordamchilari: `day_work_interval` (DayOff > is_working > jadval),
+  `day_breaks`, `available_slots` (jadval + tanaffus + band integratsiyasi)
+- **Holat mashinasi** (`bookings/services/state_machine.py`): yagona
+  `TRANSITIONS` matritsasi (PENDING→CONFIRMED/REJECTED/CANCELLED;
+  CONFIRMED→COMPLETED/NO_SHOW/CANCELLED; qolganlari terminal),
+  `transition()` — validatsiya + saqlash + `AppointmentHistory` + audit atomik
+- **Booking servis** (`bookings/services/appointments.py`): `create_appointment`
+  (barber/xizmat/sana validatsiyalari, slot dvigateli tekshiruvi, narx va
+  vaqt muzlatish, `IntegrityError → SlotUnavailable 409`),
+  `confirm/reject/cancel/complete/mark_no_show/propose_new_time` — har amalda
+  egalik tekshiruvi (sartarosh yoki ishtirokchi), `propose_new_time` navbatni
+  yangi bo'sh slotga ko'chiradi va holatni PENDING'da qoldiradi
+- Xatolar (`bookings/services/exceptions.py`): BookingValidationError 400,
+  AppointmentNotOwner 403, SlotUnavailable/InvalidTransition 409
+- **Race-test**: 10 thread bir slotga bir vaqtda → **1 g'alaba, 9
+  SlotUnavailable** — `appointment_active_slot_unique` partial unique index
+  orqali (real Postgres, `django_db(transaction=True)`)
+- Natija: **224 test yashil** (87 yangi: dvigatel matritsasi, DB integratsiya,
+  state machine, yaratish validatsiyalari, amallar, race), domen coverage
+  **99–100%** (`slots.py` 100%, `state_machine.py` 100%, `appointments.py` 99%)
+  — gate ≥90% bajarildi; jonli smoke Docker'da: 9–18 kunlik jadvalda 35 slot,
+  create→confirm→complete (tarix 3 yozuv), band slotga qayta urinish
+  `SlotUnavailable` bilan rad etildi
