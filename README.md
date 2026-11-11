@@ -1,0 +1,86 @@
+# BarBer_Client 🧑‍🔧
+
+Sartaroshxonalar va sartaroshlar uchun **onlayn navbat olish platformasi**.
+Mijoz sartaroshni tanlaydi, bo'sh vaqtni ko'radi va navbat oladi; sartarosh o'z
+shaxsiy kabinetida navbatlarni boshqaradi va kunlik tahlilni ko'radi.
+
+- 📋 To'liq reja: `docs/PLAN.md`
+- 🐍 Python 3.11 + Django 5.2 LTS + DRF
+- 🗄 PostgreSQL 16 (+PostGIS) + Redis
+- 🐳 Docker (dev: `db`, `redis`, `web`, `celery`)
+
+---
+
+## Loyiha strukturasi
+
+```
+BarBer_Client/
+├── backend/            # Django (API + SSR)
+│   ├── config/         # settings/dev|test|prod, urls, asgi, celery
+│   ├── apps/           # 10 modul: core, accounts, salons, barbers, services,
+│   │                   # schedule, bookings, notifications, reviews, analytics
+│   └── requirements/   # base / dev / prod
+├── frontend/           # SPA kabinetlar (6-bosqichda)
+├── templates/          # SSR katalog sahifalari (6-bosqichda)
+├── docker/             # Dockerfile'lar va compose fayllar
+├── scripts/            # yordamchi skriptlar
+└── docs/               # hujjatlar (10-bosqichda to'ldiriladi)
+```
+
+---
+
+## Tez boshlash
+
+### 1-usul: Docker orqali (tavsiya — 1 buyruq)
+
+```bash
+cp .env.example .env            # Windows: copy .env.example .env
+docker compose -f docker/docker-compose.dev.yml up -d --build
+```
+
+→ http://localhost:8000/health/ — `{"status": "ok"}` qaytarsa, hammasi ishlayapti.
+
+### 2-usul: Lokal (venv) + Docker'da faqat infrastruktura
+
+```bash
+py -3.11 -m venv .venv
+.venv\Scripts\activate
+pip install -r backend/requirements/dev.txt
+copy .env.example .env
+
+docker compose -f docker/docker-compose.dev.yml up -d db redis   # faqat DB+Redis
+python backend\manage.py migrate
+python backend\manage.py runserver
+```
+
+---
+
+## Buyruqlar (repo ildizidan)
+
+| Buyruq | Vazifa |
+|--------|--------|
+| `docker compose -f docker/docker-compose.dev.yml up -d` | Dev muhitni ko'tarish |
+| `docker compose -f docker/docker-compose.dev.yml down` | To'xtatish |
+| `.venv\Scripts\python.exe -m pytest` (backend ichida) | Testlar |
+| `ruff check backend && ruff format --check backend` | Lint/format tekshiruvi |
+| `.venv\Scripts\python.exe backend\manage.py check` | Django sozlamalar tekshiruvi |
+
+> **pytest** yoki `manage.py` buyruqlarini backend papkasidan ishga tushirish qulay:
+> `cd backend && ..\.venv\Scripts\python.exe -m pytest`
+
+---
+
+## Bosqichlar holati
+
+- [x] **Bosqich 1** — Loyiha karkasi va konfiguratsiya ✅
+- [ ] Bosqich 2 — Ma'lumotlar bazasi va modellar
+- [ ] Bosqich 3 — Foydalanuvchilar va autentifikatsiya
+- [ ] Bosqich 4 — Asosiy biznes mantiq (slot dvigateli, navbat tsikli)
+- [ ] Bosqich 5 — API va backend (REST + WebSocket)
+- [ ] Bosqich 6 — Frontend va dizayn
+- [ ] Bosqich 7 — Hisobotlar, Telegram bot, eslatmalar
+- [ ] Bosqich 8 — Test va xavfsizlik
+- [ ] Bosqich 9 — Docker va production deploy
+- [ ] Bosqich 10 — Hujjatlashtirish
+
+Muallif: BarBer_Client jamoasi

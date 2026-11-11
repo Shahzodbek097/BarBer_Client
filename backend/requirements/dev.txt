@@ -1,0 +1,13 @@
+-r base.txt
+
+# Test
+pytest>=8.2
+pytest-django>=4.8
+pytest-cov>=5.0
+factory-boy>=3.3
+
+# Lint / format (ruff = lint + format; black/isort o'rnini bosadi)
+ruff>=0.6
+
+# Git hooklar
+pre-commit>=3.8

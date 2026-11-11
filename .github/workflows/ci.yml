@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+jobs:
+  lint:
+    name: Lint (ruff)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install ruff
+        run: pip install ruff
+      - name: Ruff lint
+        run: ruff check backend
+      - name: Ruff format check
+        run: ruff format --check backend
+
+  test:
+    name: Tests (pytest + Postgres)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_DB: barber_client_test
+          POSTGRES_USER: barber
+          POSTGRES_PASSWORD: barber
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U barber"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgres://barber:barber@localhost:5432/barber_client_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install dependencies
+        run: pip install -r backend/requirements/dev.txt
+      - name: Django check
+        working-directory: backend
+        run: python manage.py check
+      - name: Pytest
+        working-directory: backend
+        run: pytest --cov=apps --cov-report=term-missing

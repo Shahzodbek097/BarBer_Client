@@ -1,0 +1,5 @@
+-r base.txt
+
+# ASGI/WSGI serverlar (9-bosqich: Docker + Channels)
+gunicorn>=22.0
+uvicorn[standard]>=0.30
