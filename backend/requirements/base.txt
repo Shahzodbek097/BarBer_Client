@@ -1,8 +1,10 @@
 # BarBer_Client — asosiy talablar (barcha muhitlar)
 Django>=5.2,<5.3
 djangorestframework>=3.15,<4.0
+djangorestframework-simplejwt>=5.4
 django-environ>=0.11
 psycopg[binary]>=3.2
 redis>=5.0
 celery>=5.4
+requests>=2.32
 Pillow>=10.0

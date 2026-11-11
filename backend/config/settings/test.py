@@ -1,7 +1,7 @@
 """Test muhit sozlamalari: izolyatsiyalangan va tez."""
 
 from .base import *  # noqa: F401, F403
-from .base import env
+from .base import REST_FRAMEWORK, env
 
 DEBUG = False
 
@@ -28,3 +28,11 @@ CELERY_TASK_EAGER_PROPAGATES = True
 
 # Parol hashing: tezroq
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+# Throttle: testlarda limitlar juda yumshoq (ayrim testlar override qilib toraytiradi)
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
+    **REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"],
+    "register": "1000/min",
+    "otp": "1000/min",
+    "otp_verify": "1000/min",
+}

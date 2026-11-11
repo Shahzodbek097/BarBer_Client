@@ -71,11 +71,35 @@ python backend\manage.py runserver
 
 ---
 
+## Auth API (bosqich 3)
+
+Barcha so'rovlar `/api/v1/auth/` prefiksi bilan, JSON formatda:
+
+| Endpoint | Metod | Vazifa |
+|----------|-------|--------|
+| `register/` | POST | Ro'yxatdan o'tish (`phone`, `full_name`, `role`: client/barber/salon_admin) → SMS kod |
+| `login/` | POST | Kirish (`phone`) → SMS kod |
+| `verify-otp/` | POST | Kod tekshiruvi (`phone`, `purpose`: registration/login, `code`) → `access` + `refresh` + user |
+| `refresh/` | POST | Access yangilash (`refresh`) — rotation + blacklist yoqilgan |
+| `logout/` | POST | Chiqish (`refresh`) — token blacklist'ga tushadi (auth talab qilinadi) |
+| `me/` | GET/PATCH | Joriy profil (Bearer); tahrir: `full_name`, `lang`, `avatar` |
+
+Dev muhitda (`DEBUG=True` + `SMS_PROVIDER=console`) javobda `debug_code` qaytadi —
+SMS o'rniga kodni to'g'ridan-to'g'ri ishlatish mumkin. `curl` misoli:
+
+```bash
+curl -X POST http://localhost:8000/api/v1/auth/register/ \
+  -H "Content-Type: application/json" \
+  -d '{"phone": "+998901234567", "full_name": "Ali Valiyev", "role": "client"}'
+```
+
+---
+
 ## Bosqichlar holati
 
 - [x] **Bosqich 1** — Loyiha karkasi va konfiguratsiya ✅
 - [x] **Bosqich 2** — Ma'lumotlar bazasi va modellar ✅
-- [ ] Bosqich 3 — Foydalanuvchilar va autentifikatsiya
+- [x] **Bosqich 3** — Foydalanuvchilar va autentifikatsiya ✅ (137 test, coverage 99%)
 - [ ] Bosqich 4 — Asosiy biznes mantiq (slot dvigateli, navbat tsikli)
 - [ ] Bosqich 5 — API va backend (REST + WebSocket)
 - [ ] Bosqich 6 — Frontend va dizayn

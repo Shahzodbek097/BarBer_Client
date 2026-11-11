@@ -96,3 +96,30 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Coverage `omit` (`admin.py`, `migrations/*`) — `pytest.ini`ga `--cov-config` orqali ulandi
 - Natija: **83 test yashil** (79 model test), coverage **99%** (models ≥80% gate bajerildi);
   fresh `compose down -v && up` → migrate + `loaddata regions` avtomatik; `/admin/` 200
+
+### Bosqich 3 — Foydalanuvchilar va autentifikatsiya ✅
+- Telefon + OTP autentifikatsiya: 5 xonali kod, bazada faqat sha256 hash
+  (`hmac.compare_digest` bilan solishtirish)
+- OTP himoyasi: 3 xato urinish limiti, 60s qayta yuborish dami, bir telefon soatiga
+  5 kod limiti, kod umri 5 daqiqa — `OTP_CONFIG` orqali sozlanadi
+- SMS adapterlar (plan qoidasi: tashqi tizim adapter orqali): `console` (dev, logga
+  yozadi) va `eskiz` (prod, `notify.eskiz.uz`; token keshlanadi) — provayder
+  `SMS_PROVIDER=.env` dan tanlanadi
+- JWT: access 15 min / refresh 7 kun, `ROTATE_REFRESH_TOKENS` +
+  `BLACKLIST_AFTER_ROTATION` (token_blacklist app); logout refresh'ni blacklist'ga
+  tushiradi, chet token uchun 403
+- API (`/api/v1/auth/`): `register` (client/barber/salon_admin; superadmin rad
+  etiladi), `login`, `verify-otp`, `refresh` (o'chirilgan user → 401, bloklangan →
+  403), `logout`, `me` (GET/PATCH: full_name, lang, avatar)
+- Service qatlami: `core/services/audit.py` (hech qachon buzilmaydigan audit),
+  `accounts/services/{exceptions,sms,otp,auth}.py` — viewlar faqat chaqiradi
+  (logika yo'q qoidasi)
+- Rollar: `IsNotBlocked` default guard + `IsClient/IsBarber/IsSalonAdmin/IsSuperAdmin/IsStaffRole`
+  izolyatsiya matritsasi testlari (4 rol × 4 klass)
+- Throttling (DRF ScopedRateThrottle): register 5/min, otp (login) 5/min, otp_verify 10/min
+- `debug_code` javobda faqat `DEBUG=True` **va** `SMS_PROVIDER=console` bo'lgandagina
+  qaytadi
+- Audit jurnalida: `user_registered`, `otp_verified_{purpose}`
+- Natija: **137 test yashil** (oldingi 83 + 54 yangi: auth API oqimi, OTP servis,
+  SMS adapter, rol matritsasi, throttling), coverage **99%** (auth ≥85% gate bajarildi);
+  live smoke Docker'da tekshirildi: register → verify-otp → me → logout to'liq oqim OK

@@ -5,6 +5,7 @@ Muhitga xos qiymatlar .env orqali kelinadi (12-Factor uslubi).
 Muhitga xos sozlamalar: settings/dev.py, settings/test.py, settings/prod.py
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -43,6 +44,8 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    # JWT blacklist (logout/rotation uchun token bazasi)
+    "rest_framework_simplejwt.token_blacklist",
 ]
 
 LOCAL_APPS = [
@@ -135,10 +138,43 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-# --- DRF (5-bosqichda kengaytiriladi) ---
+# --- DRF (bosqich 3: JWT auth, throttle) ---
 REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 20,
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",
+        "apps.accounts.permissions.IsNotBlocked",
+    ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "register": "5/min",
+        "otp": "5/min",  # login/dam olish: plan — login 5/min
+        "otp_verify": "10/min",
+    },
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+
+# OTP xavfsizlik sozlamalari (TZ 6.1: Eskiz, 3 urinish limit)
+OTP_CONFIG = {
+    "LIFETIME_SECONDS": 300,  # 5 daqiqa
+    "MAX_ATTEMPTS": 3,
+    "RESEND_COOLDOWN_SECONDS": 60,
+    "HOURLY_LIMIT": 5,  # bir telefon: soatiga 5 kod
+    "LENGTH": 5,
 }
 
 # --- SMS / Telegram (3 va 7-bosqichlar ishlatadi) ---
