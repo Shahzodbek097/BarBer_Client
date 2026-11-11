@@ -1,1 +1,1 @@
-# Admin registrations are added in Stage 2.
+# Analytics appda model yo'q (bosqich 7) — admin registratsiyasi ham shu bosqichda.

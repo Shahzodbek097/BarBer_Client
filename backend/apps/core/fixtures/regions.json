@@ -1,0 +1,337 @@
+[
+  {
+    "model": "core.region",
+    "pk": 1,
+    "fields": {"name": "Toshkent shahri", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 2,
+    "fields": {"name": "Toshkent viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 3,
+    "fields": {"name": "Andijon viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 4,
+    "fields": {"name": "Buxoro viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 5,
+    "fields": {"name": "Farg'ona viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 6,
+    "fields": {"name": "Jizzax viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 7,
+    "fields": {"name": "Xorazm viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 8,
+    "fields": {"name": "Namangan viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 9,
+    "fields": {"name": "Navoiy viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 10,
+    "fields": {"name": "Qashqadaryo viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 11,
+    "fields": {"name": "Qoraqalpog'iston Respublikasi", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 12,
+    "fields": {"name": "Samarqand viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 13,
+    "fields": {"name": "Sirdaryo viloyati", "is_active": true}
+  },
+  {
+    "model": "core.region",
+    "pk": 14,
+    "fields": {"name": "Surxondaryo viloyati", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 101,
+    "fields": {"region": 1, "name": "Bektembir", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 102,
+    "fields": {"region": 1, "name": "Chilonzor", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 103,
+    "fields": {"region": 1, "name": "Mirobod", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 104,
+    "fields": {"region": 1, "name": "Mirzo Ulug'bek", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 105,
+    "fields": {"region": 1, "name": "Olmazor", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 106,
+    "fields": {"region": 1, "name": "Sergeli", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 107,
+    "fields": {"region": 1, "name": "Shayxontohur", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 108,
+    "fields": {"region": 1, "name": "Uchtepa", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 109,
+    "fields": {"region": 1, "name": "Yakkasaroy", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 110,
+    "fields": {"region": 1, "name": "Yashnobod", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 111,
+    "fields": {"region": 1, "name": "Yangihayot", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 112,
+    "fields": {"region": 1, "name": "Yunusobod", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 113,
+    "fields": {"region": 2, "name": "Bekobod", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 114,
+    "fields": {"region": 2, "name": "Chirchiq", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 115,
+    "fields": {"region": 2, "name": "Yangiyo'l", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 116,
+    "fields": {"region": 2, "name": "Zangiota", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 117,
+    "fields": {"region": 3, "name": "Andijon shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 118,
+    "fields": {"region": 3, "name": "Asaka", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 119,
+    "fields": {"region": 3, "name": "Xonabod", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 120,
+    "fields": {"region": 4, "name": "Buxoro shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 121,
+    "fields": {"region": 4, "name": "Kogon", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 122,
+    "fields": {"region": 4, "name": "G'ijduvon", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 123,
+    "fields": {"region": 5, "name": "Farg'ona shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 124,
+    "fields": {"region": 5, "name": "Qo'qon", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 125,
+    "fields": {"region": 5, "name": "Marg'ilon", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 126,
+    "fields": {"region": 5, "name": "Quvasoy", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 127,
+    "fields": {"region": 6, "name": "Jizzax shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 128,
+    "fields": {"region": 6, "name": "Zarbdor", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 129,
+    "fields": {"region": 6, "name": "G'allaorol", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 130,
+    "fields": {"region": 7, "name": "Urganch shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 131,
+    "fields": {"region": 7, "name": "Xiva", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 132,
+    "fields": {"region": 7, "name": "Shovot", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 133,
+    "fields": {"region": 8, "name": "Namangan shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 134,
+    "fields": {"region": 8, "name": "Chust", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 135,
+    "fields": {"region": 8, "name": "Pop", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 136,
+    "fields": {"region": 9, "name": "Navoiy shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 137,
+    "fields": {"region": 9, "name": "Zarafshon", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 138,
+    "fields": {"region": 9, "name": "Karmana", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 139,
+    "fields": {"region": 10, "name": "Qarshi shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 140,
+    "fields": {"region": 10, "name": "Shahrisabz", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 141,
+    "fields": {"region": 10, "name": "Kitob", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 142,
+    "fields": {"region": 10, "name": "Koson", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 143,
+    "fields": {"region": 11, "name": "Nukus shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 144,
+    "fields": {"region": 11, "name": "Xo'jayli", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 145,
+    "fields": {"region": 11, "name": "Chiman", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 146,
+    "fields": {"region": 11, "name": "Beruniy", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 147,
+    "fields": {"region": 12, "name": "Samarqand shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 148,
+    "fields": {"region": 12, "name": "Kattaqo'rg'on", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 149,
+    "fields": {"region": 12, "name": "Urgut", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 150,
+    "fields": {"region": 13, "name": "Guliston shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 151,
+    "fields": {"region": 13, "name": "Yangiyer", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 152,
+    "fields": {"region": 14, "name": "Termiz shahri", "is_active": true}
+  },
+  {
+    "model": "core.district",
+    "pk": 153,
+    "fields": {"region": 14, "name": "Denov", "is_active": true}
+  }
+]

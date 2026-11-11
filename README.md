@@ -50,6 +50,7 @@ copy .env.example .env
 
 docker compose -f docker/docker-compose.dev.yml up -d db redis   # faqat DB+Redis
 python backend\manage.py migrate
+python backend\manage.py loaddata regions      # 14 viloyat / 53 tuman
 python backend\manage.py runserver
 ```
 
@@ -73,7 +74,7 @@ python backend\manage.py runserver
 ## Bosqichlar holati
 
 - [x] **Bosqich 1** — Loyiha karkasi va konfiguratsiya ✅
-- [ ] Bosqich 2 — Ma'lumotlar bazasi va modellar
+- [x] **Bosqich 2** — Ma'lumotlar bazasi va modellar ✅
 - [ ] Bosqich 3 — Foydalanuvchilar va autentifikatsiya
 - [ ] Bosqich 4 — Asosiy biznes mantiq (slot dvigateli, navbat tsikli)
 - [ ] Bosqich 5 — API va backend (REST + WebSocket)

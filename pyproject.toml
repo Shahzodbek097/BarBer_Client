@@ -11,3 +11,9 @@ select = ["E", "F", "I", "B", "UP", "DJ"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["apps", "config"]
+
+[tool.coverage.run]
+omit = ["**/admin.py", "**/migrations/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "# noqa"]

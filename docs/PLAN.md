@@ -80,3 +80,19 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - CI: lint + test (Postgres service bilan)
 - `/health/` endpoint; logging sozlamalari
 - Natija: gate shartlari bajarildi (README'dagi buyruqlar bilan tekshiriladi)
+
+### Bosqich 2 — Ma'lumotlar bazasi va modellar ✅
+- Kastom `User` (`AbstractUser`, telefon login, 4 rol: client/barber/salon_admin/superadmin,
+  `is_verified`/`is_blocked`/lang) + `OTPCode` (sha256 hash)
+- 17 biznes jadval + 1 M2M (specialties): `accounts_user`, `accounts_otpcode`, `core_region`,
+  `core_district`, `core_auditlog`, `salons_salon`, `barbers_barberprofile`, `barbers_favorite`,
+  `services_servicecategory`, `services_service`, `schedule_workschedule`, `schedule_schedulebreak`,
+  `schedule_dayoff`, `bookings_appointment`, `bookings_appointmenthistory`,
+  `notifications_notification`, `reviews_review` (+ `barbers_barberprofile_specialties`)
+- 10 nomlangan constraint DB'da tasdiqlangan (9 `pg_constraint` + shartli UNIQUE
+  `appointment_active_slot_unique` partial index sifatida)
+- 9 app'da admin.py registratsiyalar (AuditLog faqat o'qish; BarBer jadval inline'lari schedule adminida)
+- factory-boy factory'lar (9 app), regions fixture'i (14 viloyat / 53 tuman, pk: 1–14 / 101–153)
+- Coverage `omit` (`admin.py`, `migrations/*`) — `pytest.ini`ga `--cov-config` orqali ulandi
+- Natija: **83 test yashil** (79 model test), coverage **99%** (models ≥80% gate bajerildi);
+  fresh `compose down -v && up` → migrate + `loaddata regions` avtomatik; `/admin/` 200

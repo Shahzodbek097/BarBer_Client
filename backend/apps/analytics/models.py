@@ -1,1 +1,2 @@
-# Models for the 'analytics' app are added in Stage 2 (database and models).
+# Analytics appning o'z modeli yo'q — mavjud jadvallardan (bookings, reviews,
+# schedule) faqat O'QIYDI (bosqich 7'da hisobotlar qatlami).

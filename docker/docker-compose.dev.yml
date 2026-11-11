@@ -39,7 +39,7 @@ services:
       context: ..
       dockerfile: docker/web/Dockerfile.dev
     container_name: barber_web
-    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000 --noreload"
+    command: sh -c "python manage.py migrate && python manage.py loaddata regions && python manage.py runserver 0.0.0.0:8000 --noreload"
     volumes:
       - ../backend:/app/backend
     ports:

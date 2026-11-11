@@ -126,9 +126,8 @@ MEDIA_ROOT = BASE_DIR / "media"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # --- Autentifikatsiya ---
-# CUSTOM USER 2-bosqichda yaratiladi, shu yerda faollashtiladi (birinchi
-# migrate'dan OLDIN bo'lishi shart):
-# AUTH_USER_MODEL = "accounts.User"
+# Custom user: telefon = login identifikator (bosqich 2)
+AUTH_USER_MODEL = "accounts.User"
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
