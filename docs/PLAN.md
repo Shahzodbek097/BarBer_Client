@@ -153,3 +153,51 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
   — gate ≥90% bajarildi; jonli smoke Docker'da: 9–18 kunlik jadvalda 35 slot,
   create→confirm→complete (tarix 3 yozuv), band slotga qayta urinish
   `SlotUnavailable` bilan rad etildi
+
+### Bosqich 5 — API va backend (REST + WebSocket) ✅
+- **Swagger/OpenAPI** (`drf-spectacular`): `/api/schema/` (sxema) va
+  `/api/docs/` (Swagger UI). Gate: barcha majburiy endpointlar sxemada bor
+  (`test_swagger.py` ro'yxat bilan tekshiradi — auth, katalog, bookings,
+  kabinetlar, reviews, notifications, admin)
+- **Katalog API** (`/api/v1/catalog/*`, ochiq/AllowAny): regions
+  (+`/districts/`), salons (faqat APPROVED, filtrlar region/district/search),
+  barbers (APPROVED, filtrlar salon/search/is_active) + `services/` (o'ziniki
+  va saloni xizmatlari) + `slots/` (slot dvigateli + band navbatlar;
+  `service_id`/`day` validatsiya, boshqa sartarosh xizmati → 400)
+- **Navbat API** (`/api/v1/bookings/*`): mijoz — `create` (slot band bo'lsa
+  409, nofaol sartarosh → 400), `my` (?status=), `retrieve/cancel/reschedule`
+  (faqat ishtirokchi — qo'shimcha Q-filtr + service egalik tekshiruvi, notanish
+  → 404); sartarosh — `incoming` (?status=&day=), `manual` (orxonadagi mijoz,
+  telefon bo'yicha), `confirm/reject/propose/complete/no-show`; mijozning
+  sartarosh amallariga urinishi → 403. View'lar faqat services chaqiradi
+  (logika yo'q qoidasi)
+- **Sartarosh kabineti** (`/api/v1/barber/*`): profile (GET/POST onboarding/
+  PATCH), services CRUD (o'chirish = soft `is_active=False` — navbatlar
+  PROTECT), haftalik jadval GET/PUT (update_or_create — tanaffuslar saqlanadi),
+  tanaffuslar (ish vaqti ichida bo'lishi shart), dam olish kunlari,
+  Faol/Nofaol tugmasi. Barchasi `IsBarber`, izolyatsiya ikki qatlamli
+- **Salon egasi** (`/api/v1/salon/*`): profil GET/PATCH (status/joylashuv
+  tahrirlanmaydi — moderatsiya), o'z salonidagi sartaroshlar ro'yxati
+- **Sharhlar** (`/api/v1/reviews/`): yaratish faqat COMPLETED navbatga,
+  har navbat 1 sharh, yaratilganda sartarosh `rating_avg/rating_count`
+  qayta hisoblanadi; ochiq ro'yxat `/reviews/barber/{id}/` (faqat ko'rinadiganlar)
+- **Xabarnomalar** (`/api/v1/notifications/*`): ro'yxat (faqat o'ziniki),
+  `read`, `read-all`, `unread-count` (badge)
+- **Super admin** (`/api/v1/admin/*`): salonlar ro'yxati (?status=),
+  `approve`/`block` (audit bilan), umumiy statistika (`users/salons/
+  appointments` bo'yicha hisoblar) — statistika `bookings/services/stats.py`da
+  (import yo'nalishi buzilmaydi)
+- **WebSocket push** (`channels` + `channels-redis`): `/ws/client/{user_id}/`
+  va `/ws/barber/{user_id}/` — JWT `?token=` bilan (brauzer WS'da header
+  yuborolmaydi), yaroqsiz/egasi mos kelmaydigan token → ulanish yopiladi.
+  Hodisalar signal orqali (`notifications/signals.py`: `bookings` import
+  yo'nalishini Buzmaslik uchun) — yangi navbat → sartarosh push, har holat
+  o'tishi → qarama-qarshi tomonga push
+- **Muhit**: `daphne` (ASGI) INSTALLED_APPS boshida, dev compose'da
+  `REDIS_CHANNEL_URL` qo'shildi (redis 6379/2); testlarda InMemory layer
+- Natija: **334 test yashil** (110 yangi: katalog, bookings, kabinet, salon,
+  reviews, notifications, admin, Swagger gate, WS push — InMemory layer bilan),
+  umumiy coverage **99%** (gate ≥80% bajarildi). Jonli smoke Docker'da:
+  `/health/` OK, `/api/schema/` + `/api/docs/` 200, Redis channel layer
+  round-trip OK, haqiqiy WS ulanish → yangi navbat yaratilganda push qabul
+  qilindi (daphne + Redis layer)

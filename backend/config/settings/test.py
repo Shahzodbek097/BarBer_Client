@@ -36,3 +36,6 @@ REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"] = {
     "otp": "1000/min",
     "otp_verify": "1000/min",
 }
+
+# WebSocket: testlarda Redis kerak emas — in-memory channel layer
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}

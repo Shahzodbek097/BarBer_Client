@@ -49,6 +49,31 @@ def busy_intervals(barber, day: date) -> list[tuple[time, time]]:
     return [(a.start_time, a.end_time) for a in qs]
 
 
+def list_client_appointments(user, *, status: str = ""):
+    """Mijozning O'Z navbatlari (IDOR himoyasi: client=user).
+
+    Bosqich 5 API uchun: QuerySet izolyatsiyasi service qatlamida.
+    """
+    qs = Appointment.objects.filter(client=user).select_related("barber__user", "service", "salon")
+    if status:
+        qs = qs.filter(status=status)
+    return qs.order_by("-date", "-start_time")
+
+
+def list_barber_appointments(user, *, status: str = "", day=None):
+    """Sartaroshning O'Z navbatlari (kelib tushganlar ro'yxati)."""
+    profile = getattr(user, "barber_profile", None)
+    if profile is None:
+        raise BookingValidationError("Sartarosh profili topilmadi.")
+
+    qs = Appointment.objects.filter(barber=profile).select_related("client", "service", "salon")
+    if status:
+        qs = qs.filter(status=status)
+    if day is not None:
+        qs = qs.filter(date=day)
+    return qs.order_by("date", "start_time")
+
+
 def _local_now() -> datetime:
     """Naive lokal joriy vaqt (jadval vaqt maydonlari naive lokalda)."""
     return timezone.localtime().replace(tzinfo=None)
@@ -223,6 +248,46 @@ def propose_new_time(appointment: Appointment, *, by, day: date, start_time: tim
     to'siq emas (busy ro'yxatidan chetlatiladi).
     """
     _ensure_barber(appointment, by)
+    return _move_to_slot(
+        appointment,
+        by=by,
+        day=day,
+        start_time=start_time,
+        reply=f"Yangi vaqt taklif qilindi: {day:%d.%m.%Y} {start_time:%H:%M}.",
+        comment=f"Yangi vaqt taklif qilindi: {day} {start_time}.",
+    )
+
+
+def reschedule(appointment: Appointment, *, by, day: date, start_time: time) -> Appointment:
+    """Mijoz o'z PENDING navbatini boshqa bo'sh vaqtga ko'chiradi."""
+    if by is None or appointment.client_id != by.id:
+        raise AppointmentNotOwner()
+    if appointment.status != AppointmentStatus.PENDING:
+        raise BookingValidationError("Faqat kutilayotgan (PENDING) navbatni o'zgartirish mumkin.")
+    return _move_to_slot(
+        appointment,
+        by=by,
+        day=day,
+        start_time=start_time,
+        reply="",
+        comment=f"Mijoz vaqtni o'zgartirdi: {day} {start_time}.",
+    )
+
+
+def _move_to_slot(
+    appointment: Appointment,
+    *,
+    by,
+    day: date,
+    start_time: time,
+    reply: str,
+    comment: str,
+) -> Appointment:
+    """Navbatni yangi bo'sh slotga ko'chiradi (propose/reschedule ortak).
+
+    Slot band bo'lsa SlotUnavailable (409); yangi slotda yana biror
+    navbat paydo bo'lsa DB constraint to'sadi (IntegrityError → 409).
+    """
     now = _local_now()
     _validate_date_time(day, start_time, now=now)
 
@@ -241,9 +306,8 @@ def propose_new_time(appointment: Appointment, *, by, day: date, start_time: tim
             appointment.date = day
             appointment.start_time = slot.start
             appointment.end_time = slot.end
-            appointment.barber_reply = (
-                f"Yangi vaqt taklif qilindi: {day:%d.%m.%Y} {start_time:%H:%M}."
-            )
+            if reply:
+                appointment.barber_reply = reply
             appointment.save(
                 update_fields=("date", "start_time", "end_time", "barber_reply", "updated_at")
             )
@@ -252,7 +316,7 @@ def propose_new_time(appointment: Appointment, *, by, day: date, start_time: tim
                 old_status=appointment.status,
                 new_status=appointment.status,
                 changed_by=by,
-                comment=f"Yangi vaqt taklif qilindi: {day} {start_time}.",
+                comment=comment,
             )
     except IntegrityError:
         raise SlotUnavailable() from None

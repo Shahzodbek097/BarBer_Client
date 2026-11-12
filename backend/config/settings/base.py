@@ -46,6 +46,10 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     # JWT blacklist (logout/rotation uchun token bazasi)
     "rest_framework_simplejwt.token_blacklist",
+    # WebSocket (bosqich 5)
+    "channels",
+    # OpenAPI sxema generatori (Swagger)
+    "drf_spectacular",
 ]
 
 LOCAL_APPS = [
@@ -61,7 +65,8 @@ LOCAL_APPS = [
     "apps.analytics",
 ]
 
-INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+# Daphne runserver'ni ASGI/WS-ga o'tkazadi — INSTALLED_APPS boshida turishi shart
+INSTALLED_APPS = ["daphne", *DJANGO_APPS, *THIRD_PARTY_APPS, *LOCAL_APPS]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -74,6 +79,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "config.urls"
+
+ASGI_APPLICATION = "config.asgi.application"
+
+# WebSocket channel layer: dev/prod — Redis (6379/2, broker 0/1 dan alohida)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [env("REDIS_CHANNEL_URL", default="redis://localhost:6379/2")]},
+    }
+}
 
 TEMPLATES = [
     {
@@ -157,6 +172,17 @@ REST_FRAMEWORK = {
         "otp": "5/min",  # login/dam olish: plan — login 5/min
         "otp_verify": "10/min",
     },
+    # OpenAPI sxema generatori (Swagger)
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "BarBer_Client API",
+    "DESCRIPTION": "Sartaroshxona va sartarosh onlayn navbat platformasi (v1).",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    "COMPONENT_SPLIT_REQUEST": True,
+    "SCHEMA_PATH_PREFIX": "/api/v1",
 }
 
 SIMPLE_JWT = {
