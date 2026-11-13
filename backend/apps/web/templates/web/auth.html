@@ -1,0 +1,40 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Kirish — BarBer{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="tabs" id="auth-tabs">
+    <button class="tab active" data-mode="login">Kirish</button>
+    <button class="tab" data-mode="register">Ro'yxatdan o'tish</button>
+  </div>
+
+  <div class="card" id="step-phone">
+    <h1 class="auth-title" id="auth-title">Telefon raqamingiz</h1>
+    <p class="muted auth-title">Kod SMS orqali yuboriladi. Faqat +998 raqamlar.</p>
+    <div id="register-fields" class="hidden">
+      <label for="f-full-name">Ism familiya</label>
+      <input id="f-full-name" placeholder="Masalan: Ali Valiyev" maxlength="100">
+      <label for="f-role">Rol</label>
+      <select id="f-role">
+        <option value="client">Mijoz — navbat olaman</option>
+        <option value="barber">Sartarosh</option>
+        <option value="salon_admin">Salon egasi</option>
+      </select>
+    </div>
+    <label for="f-phone">Telefon</label>
+    <input id="f-phone" inputmode="tel" placeholder="+998 90 123 45 67">
+    <p id="phone-error" class="error-text hidden"></p>
+    <button id="send-code" class="btn btn-primary btn-block mt">Kod yuborish</button>
+  </div>
+
+  <div class="card hidden" id="step-code">
+    <h1 class="auth-title">Tasdiqlash kodi</h1>
+    <p class="muted auth-title" id="code-hint"></p>
+    <input id="f-code" class="code-input" inputmode="numeric" maxlength="6" placeholder="— — — — —">
+    <p id="code-error" class="error-text hidden"></p>
+    <button id="verify-btn" class="btn btn-primary btn-block mt">Tasdiqlash</button>
+    <button id="back-btn" class="btn btn-block mt">Raqamni o'zgartirish</button>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/auth.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

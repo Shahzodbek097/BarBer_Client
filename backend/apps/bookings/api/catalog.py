@@ -18,7 +18,15 @@ from apps.bookings.services import appointments as appt_service
 from apps.core.models import District, Region
 from apps.salons.models import Salon, SalonStatus
 from apps.schedule.services import slots as slot_engine
-from apps.services.models import Service, ServiceOwner
+from apps.services.models import Service, ServiceCategory, ServiceOwner
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    """UI'da xizmat yaratish va mutaxassisliklar uchun kategoriya ro'yxati."""
+
+    class Meta:
+        model = ServiceCategory
+        fields = ("id", "name", "slug", "order")
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -116,6 +124,15 @@ class RegionViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.G
         region = self.get_object()
         data = DistrictSerializer(region.districts.filter(is_active=True), many=True).data
         return Response(data)
+
+
+class CategoryViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """GET /catalog/categories/ — xizmat kategoriyalari (ochiq)."""
+
+    queryset = ServiceCategory.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [AllowAny]
+    pagination_class = None
 
 
 class SalonViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):

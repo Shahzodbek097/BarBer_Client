@@ -112,11 +112,13 @@ class WeekSchedulePutSerializer(serializers.Serializer):
 
 class ScheduleBreakSerializer(serializers.ModelSerializer):
     schedule = serializers.PrimaryKeyRelatedField(read_only=True)
+    # UI'da kun nomini ko'rsatish uchun (jadval bilan bog'liq)
+    weekday = serializers.IntegerField(source="schedule.weekday", read_only=True)
 
     class Meta:
         model = ScheduleBreak
-        fields = ("id", "schedule", "start_time", "end_time")
-        read_only_fields = ("id", "schedule")
+        fields = ("id", "schedule", "weekday", "start_time", "end_time")
+        read_only_fields = ("id", "schedule", "weekday")
 
 
 class BreakCreateSerializer(serializers.Serializer):

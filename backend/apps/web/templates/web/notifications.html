@@ -1,0 +1,15 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Xabarlar — BarBer{% endblock %}
+{% block content %}
+<div id="guard"></div>
+<div id="notif-app" class="hidden">
+  <div class="row-between">
+    <h1>Xabarlar</h1>
+    <button id="read-all-btn" class="btn btn-sm">Barchasini o'qilgan qilish</button>
+  </div>
+  <section id="notif-list" class="stack mt"></section>
+  <p id="empty" class="empty hidden">Xabarlar yo'q.</p>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/notifications.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

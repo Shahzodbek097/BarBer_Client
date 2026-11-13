@@ -201,3 +201,44 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
   `/health/` OK, `/api/schema/` + `/api/docs/` 200, Redis channel layer
   round-trip OK, haqiqiy WS ulanish → yangi navbat yaratilganda push qabul
   qilindi (daphne + Redis layer)
+
+### Bosqich 6 — Frontend va dizayn ✅
+- **`apps/web`** — faqat taqdimot qatlami (presentational): boshqa app'lardan
+  import YO'Q; barcha ma'lumot `/api/v1/*` orqali (JWT `localStorage`da), WS
+  native `WebSocket ?token=` bilan. Build qutisi yo'q: Django template + vanila
+  JS (ES module) + qo'l bilan yozilgan mobil-first CSS
+- **Sahifalar va roliq izolyatsiyasi**: `/` ochiq katalog (region/search filtrlar,
+  salon kartalari), `/salon/{id}/` salon sahifasi (sartaroshlar + xizmatlar),
+  `/barber/{id}/` sartarosh sahifasi (xizmat tanlash → bo'sh slot → navbat);
+  ro'yxatdan o'tmagan foydalanuvchi navbat olishga urinsa intent
+  `sessionStorage (bb_pending_booking)`'ga saqlanadi → auth oqimi → `?next`
+  qaytish → navbat avtomatik band qilinadi; kabinetlar: `/c/` (mijoz —
+  holat tablari, vazncha, bekor qilish, vaqt o'zgartirish modali, sharh
+  yozish), `/barber/` (onboarding, kiruvchi so'rovlar: tasdiqlash / rad etish
+  javob modali bilan / yangi vaqt taklif (sana + slot panjara) / bajarildi /
+  kelmadi / bekor qilish, qo'lda navbat yozish, Faol-Nofaol, haftalik jadval
+  va xizmatlar sahifasi), `/salon/` (profil forma, sartaroshlar ro'yxati),
+  `/panel/` (8 statistika kartasi, salon moderatsiyasi approve/block),
+  `/notifications/` (ro'yxat, o'qilgan qilish, barchasini o'qish + badge)
+- **Statik versiyalash**: `STATIC_VERSION` + context processor — barcha statik
+  linklar `?v={{ STATIC_VERSION }}` (brauzer keshini buzish)
+- **Dizayn tizimi**: CSS o'zgaruvchilar (brand/ink/line...), `.card/.btn/.tag/
+  .chip/.modal/.toast/.stats` komponentlari; breakpoint'lar 768/1440
+- **Responsive 360/768/1440**: katalog grid 1→2→3 ustun, statistika 2→4 ustun,
+  filtrlar mobil-da ustunli → 768+ qatorli, topbar mobilda 2 qator (logo+user /
+  menyular), 768+ bitta qator — computed style + skrinshot bilan tekshirildi
+- **E2E (brauzer, dasturiy)**: US-1 anon → ro'yxatdan o'tish → avto-navbat
+  to'liq oqim; US-2 ro'yxat/bekor qilish/vaqt o'zgartirish; US-3/US-4 sartarosh
+  amallarining barchasi (modallar bilan); US-5 salon forma saqlash; US-6 panel
+  statistika + salon tasdiqlash; US-7 sharh yozish (reyting yangilanadi);
+  xabarlar read-all; **WS push jonli isbotlandi**: service-layer'dan navbat
+  yaratilganda toast ("Yangi navbat so'rovi — ..."), `bb:notify` event va
+  badge oshishi + ro'yxat avto-yangilanishi bir vaqtda kuzatildi
+- E2E davomida topilgan va tuzatilgan: kabinet ota-konteynerlari `hidden`
+  qolishi, `[hidden]` atributini CSS `display` yengib o'tishi (universal
+  `[hidden]{display:none!important}` reset), read-all'dan keyin badge 0 ga
+  tushmasligi
+- **dev.py**: `X_FRAME_OPTIONS = "SAMEORIGIN"` (faqat dev — prod `DENY`)
+- Natija: **364 test yashil** (20 sahifa smoke test: har page 200 + xatolar),
+  coverage **99%**; gate — US-1…US-7 UI'da to'liq, responsive 3 ko'rsatgich,
+  WS push ishlaydi — bajarildi

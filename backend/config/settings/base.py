@@ -63,6 +63,7 @@ LOCAL_APPS = [
     "apps.notifications",
     "apps.reviews",
     "apps.analytics",
+    "apps.web",
 ]
 
 # Daphne runserver'ni ASGI/WS-ga o'tkazadi — INSTALLED_APPS boshida turishi shart
@@ -101,6 +102,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "apps.web.context_processors.static_version",
             ],
         },
     },
@@ -142,6 +144,10 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Statik fayl versiyasi (URL: ?v=...) — build qutisi yo'q, shuning uchun oddiy
+# versiya ko'tariladi bosqichlarda. Stage 9'da STATIC_ROOT + collectstatic.
+STATIC_VERSION = "11"
 
 # --- Autentifikatsiya ---
 # Custom user: telefon = login identifikator (bosqich 2)

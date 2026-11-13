@@ -1,0 +1,37 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Salonim — BarBer{% endblock %}
+{% block content %}
+<div id="guard"></div>
+<div id="salon-app" class="hidden">
+  <h1>Salonim</h1>
+  <div class="card hidden" id="no-salon">
+    <p>Salon profilingiz hali yaratilmagan. Super admin bilan bog'laning.</p>
+  </div>
+  <div class="hidden" id="salon-content">
+    <div class="card">
+      <div class="row-between"><h2>Profil</h2><span id="s-status"></span></div>
+      <label for="sp-name">Salon nomi</label>
+      <input id="sp-name" maxlength="200">
+      <label for="sp-address">Manzil</label>
+      <input id="sp-address" maxlength="255">
+      <label for="sp-phone">Telefon</label>
+      <input id="sp-phone" maxlength="20">
+      <div class="form-row">
+        <div><label for="sp-start">Ish boshlanishi</label><input id="sp-start" type="time"></div>
+        <div><label for="sp-end">Ish tugashi</label><input id="sp-end" type="time"></div>
+      </div>
+      <label for="sp-desc">Tavsif</label>
+      <textarea id="sp-desc" rows="3" maxlength="2000"></textarea>
+      <button id="sp-save" class="btn btn-primary mt">Saqlash</button>
+    </div>
+
+    <div class="card mt">
+      <h2>Sartaroshlarim</h2>
+      <section id="barber-list" class="grid"></section>
+      <p id="barbers-empty" class="muted hidden">Sartaroshlar yo'q — ular o'z profilini yaratganda bu yerda ko'rinadi.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/salon_cabinet.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

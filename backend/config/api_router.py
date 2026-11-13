@@ -15,7 +15,7 @@ from apps.barbers.api.views import (
     DayOffViewSet,
     WeekScheduleView,
 )
-from apps.bookings.api.catalog import BarberViewSet, RegionViewSet, SalonViewSet
+from apps.bookings.api.catalog import BarberViewSet, CategoryViewSet, RegionViewSet, SalonViewSet
 from apps.bookings.api.views import BookingViewSet
 from apps.notifications.api.views import NotificationViewSet
 from apps.reviews.api.views import BarberReviewsView, ReviewCreateView
@@ -29,6 +29,7 @@ from config.api_admin import (
 
 router = DefaultRouter()
 router.register("catalog/regions", RegionViewSet, basename="catalog-regions")
+router.register("catalog/categories", CategoryViewSet, basename="catalog-categories")
 router.register("catalog/salons", SalonViewSet, basename="catalog-salons")
 router.register("catalog/barbers", BarberViewSet, basename="catalog-barbers")
 router.register("bookings", BookingViewSet, basename="bookings")

@@ -1,0 +1,38 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Sartarosh — BarBer{% endblock %}
+{% block content %}
+<div id="barber-header"></div>
+
+<div class="card mt">
+  <h3>Xizmat tanlang</h3>
+  <div id="service-list" class="stack"></div>
+</div>
+
+<div class="card mt hidden" id="slot-panel">
+  <h3>Vaqt tanlang</h3>
+  <div id="day-chips" class="chips mb"></div>
+  <div id="slot-chips" class="slot-grid"></div>
+  <p id="slot-empty" class="empty hidden">Bu kunda bo'sh vaqt yo'q — boshqa kunni tanlang.</p>
+
+  <div class="hidden" id="booking-panel">
+    <hr class="divider">
+    <label for="f-note">Izoh (ixtiyoriy)</label>
+    <textarea id="f-note" rows="2" maxlength="500" placeholder="Masalan: soqolni qisqa qilib olaman"></textarea>
+    <button id="book-btn" class="btn btn-primary btn-block mt">Navbat olish</button>
+  </div>
+</div>
+
+<div class="card mt hidden" id="success-panel">
+  <h3>✅ Navbat olindi!</h3>
+  <p id="success-text" class="muted"></p>
+  <a href="/c/" class="btn btn-primary">Navbatlarimni ko'rish</a>
+</div>
+
+<div class="card mt" id="reviews-card">
+  <h3>Baholar</h3>
+  <div id="review-list" class="stack"></div>
+  <p id="reviews-empty" class="muted hidden">Hozircha sharhlar yo'q.</p>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/barber_page.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

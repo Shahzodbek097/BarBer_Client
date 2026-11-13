@@ -1,0 +1,60 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Profil va jadval — BarBer{% endblock %}
+{% block content %}
+<div id="guard"></div>
+<div id="profile-app" class="hidden">
+
+  <div class="card">
+    <h1>Profil</h1>
+    <label for="p-bio">O'zingiz haqida</label>
+    <textarea id="p-bio" rows="3" maxlength="2000"></textarea>
+    <div class="form-row">
+      <div>
+        <label for="p-exp">Tajriba (yil)</label>
+        <input id="p-exp" type="number" min="0" max="60">
+      </div>
+    </div>
+    <label>Mutaxassisliklar</label>
+    <div id="p-specialties" class="chips"></div>
+    <button id="p-save" class="btn btn-primary mt">Saqlash</button>
+  </div>
+
+  <div class="card mt">
+    <div class="row-between"><h2>Xizmatlarim</h2><button id="s-add-open" class="btn btn-sm btn-primary">+ Qo'shish</button></div>
+    <section id="s-list" class="stack"></section>
+    <p id="s-empty" class="muted">Xizmatlar yo'q — mijozlar ko'rishi uchun qo'shing.</p>
+  </div>
+
+  <div class="card mt">
+    <h2>Haftalik jadval</h2>
+    <p class="muted">Ish vaqtlarini belgilang — slotlar shu asosda chiqadi.</p>
+    <div id="schedule-rows" class="stack"></div>
+    <button id="sch-save" class="btn btn-primary mt">Jadvalni saqlash</button>
+  </div>
+
+  <div class="card mt">
+    <h2>Tanaffuslar</h2>
+    <div class="form-row">
+      <div><label for="b-weekday">Kun</label><select id="b-weekday"></select></div>
+      <div><label for="b-start">Boshlanish</label><input id="b-start" type="time" step="300"></div>
+      <div><label for="b-end">Tugash</label><input id="b-end" type="time" step="300"></div>
+    </div>
+    <button id="b-add" class="btn mt">Qo'shish</button>
+    <section id="b-list" class="stack mt"></section>
+    <p id="b-empty" class="muted hidden">Tanaffuslar yo'q.</p>
+  </div>
+
+  <div class="card mt">
+    <h2>Dam olish kunlari</h2>
+    <div class="form-row">
+      <div><label for="d-date">Sana</label><input id="d-date" type="date"></div>
+      <div><label for="d-reason">Sabab</label><input id="d-reason" placeholder="Masalan: ta'til" maxlength="200"></div>
+    </div>
+    <button id="d-add" class="btn mt">Qo'shish</button>
+    <section id="d-list" class="stack mt"></section>
+    <p id="d-empty" class="muted hidden">Dam olish kunlari yo'q.</p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/barber_profile.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

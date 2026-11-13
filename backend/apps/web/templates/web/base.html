@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}BarBer — onlayn navbat{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'web/css/app.css' %}?v={{ STATIC_VERSION }}">
+</head>
+<body data-page="{{ page_name }}">
+<header class="topbar">
+  <a class="logo" href="/">✂ <span>BarBer</span></a>
+  <nav class="nav" id="nav" aria-label="Asosiy menyu"></nav>
+  <div class="userbox" id="userbox"></div>
+</header>
+
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+
+<div id="toasts" class="toasts" aria-live="polite"></div>
+<div id="modal-root"></div>
+
+<script type="module" src="{% static 'web/js/ws.js' %}?v={{ STATIC_VERSION }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

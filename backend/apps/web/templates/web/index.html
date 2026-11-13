@@ -1,0 +1,19 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Sartaroshxona tanlang — BarBer{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Sartaroshxona tanlang</h1>
+  <p class="muted">Bo'sh vaqtni ko'rib, bir daqiqada navbat oling — kutish yo'q.</p>
+</section>
+
+<div class="card filters mb">
+  <select id="region-select" class="grow"></select>
+  <input id="search-input" class="grow" placeholder="Salon nomi bo'yicha qidirish..." maxlength="100">
+  <button id="search-btn" class="btn btn-primary">Qidirish</button>
+</div>
+
+<section id="salon-grid" class="grid grid-2 grid-3"></section>
+<p id="empty" class="empty hidden">Salon topilmadi — boshqa viloyat yoki nom bilan urinib ko'ring.</p>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/catalog.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

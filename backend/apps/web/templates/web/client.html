@@ -1,0 +1,20 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Navbatlarim — BarBer{% endblock %}
+{% block content %}
+<div id="guard"></div>
+<div id="client-app" class="hidden">
+  <h1>Navbatlarim</h1>
+  <div class="tabs" id="status-tabs">
+    <button class="tab active" data-status="">Barchasi</button>
+    <button class="tab" data-status="pending">Kutilmoqda</button>
+    <button class="tab" data-status="confirmed">Tasdiqlangan</button>
+    <button class="tab" data-status="completed">Bajarildi</button>
+    <button class="tab" data-status="cancelled">Bekor qilindi</button>
+  </div>
+  <section id="booking-list" class="grid"></section>
+  <p id="empty" class="empty hidden">Navbatlar yo'q — katalogdan tanlab oling.</p>
+  <p class="muted mt"><a href="/">← Katalogga qaytish</a></p>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/client.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

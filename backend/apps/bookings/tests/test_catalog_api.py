@@ -21,6 +21,19 @@ from apps.services.models import ServiceOwner
 pytestmark = pytest.mark.django_db
 
 
+class TestCategories:
+    def test_list(self, api_client):
+        from apps.services.factories import ServiceCategoryFactory
+
+        category = ServiceCategoryFactory()
+
+        response = api_client.get("/api/v1/catalog/categories/")
+
+        assert response.status_code == 200
+        ids = [row["id"] for row in response.json()]
+        assert category.id in ids
+
+
 class TestRegions:
     def test_regions_list(self, api_client):
         region = RegionFactory()

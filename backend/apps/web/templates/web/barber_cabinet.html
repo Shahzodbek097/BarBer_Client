@@ -1,0 +1,71 @@
+{% extends "web/base.html" %}
+{% load static %}
+{% block title %}Sartarosh kabineti — BarBer{% endblock %}
+{% block content %}
+<div id="guard"></div>
+<div id="barber-app" class="hidden">
+
+  <div class="card hidden mb" id="onboarding">
+    <h1>Profil yaratish</h1>
+    <p class="muted">Kabinetga kirish uchun sartarosh profilini yaratiladi.</p>
+    <label for="ob-bio">O'zingiz haqida</label>
+    <textarea id="ob-bio" rows="3" maxlength="2000" placeholder="Masalan: 8 yillik tajriba, soch va soqol usti ustasi"></textarea>
+    <label for="ob-exp">Tajriba (yil)</label>
+    <input id="ob-exp" type="number" min="0" max="60" value="0">
+    <button id="ob-save" class="btn btn-primary btn-block mt">Yaratish</button>
+    <p id="ob-error" class="error-text hidden"></p>
+  </div>
+
+  <div id="cabinet" class="hidden">
+    <div class="row-between">
+      <h1>Kabinet</h1>
+      <label class="switch" title="Faol bo'lsangiz, mijozlar navbat olishi mumkin">
+        <input type="checkbox" id="status-switch">
+        <span class="track"><span class="knob"></span></span>
+        <span id="status-label" class="muted">Nofaol</span>
+      </label>
+    </div>
+
+    <div class="card mt">
+      <div class="row-between">
+        <h3>Yangi so'rovlar <span class="muted" id="incoming-count"></span></h3>
+        <button id="reload-btn" class="btn btn-sm">↻ Yangilash</button>
+      </div>
+      <div class="chips mt" id="incoming-tabs">
+        <button class="chip active" data-status="">Barchasi</button>
+        <button class="chip" data-status="pending">Kutilmoqda</button>
+        <button class="chip" data-status="confirmed">Tasdiqlangan</button>
+        <button class="chip" data-status="completed">Bajarildi</button>
+        <button class="chip" id="today-chip">Bugun</button>
+      </div>
+      <section id="incoming-list" class="stack mt"></section>
+      <p id="incoming-empty" class="empty hidden">So'rovlar yo'q.</p>
+    </div>
+
+    <div class="card mt">
+      <h3>Qo'lda navbat yozish (orxonadagi mijoz)</h3>
+      <div class="form-row">
+        <div>
+          <label for="m-phone">Mijoz telefoni</label>
+          <input id="m-phone" placeholder="+998901234567">
+        </div>
+        <div>
+          <label for="m-service">Xizmat</label>
+          <select id="m-service"></select>
+        </div>
+        <div>
+          <label for="m-date">Sana</label>
+          <input id="m-date" type="date">
+        </div>
+        <div>
+          <label for="m-time">Vaqt</label>
+          <input id="m-time" type="time" step="300">
+        </div>
+      </div>
+      <button id="m-save" class="btn btn-primary mt">Navbat yozish</button>
+      <p id="m-error" class="error-text hidden"></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script type="module" src="{% static 'web/js/pages/barber_cabinet.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}
