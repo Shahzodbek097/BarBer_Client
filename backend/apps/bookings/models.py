@@ -75,6 +75,13 @@ class Appointment(models.Model):
     price = models.DecimalField("Narx (UZS)", max_digits=12, decimal_places=2, default=Decimal("0"))
     client_note = models.CharField("Mijoz izohi", max_length=500, blank=True, default="")
     barber_reply = models.CharField("Sartarosh javobi", max_length=500, blank=True, default="")
+    # Eslatma idempotentligi: bir navbatga bitta eslatma (bosqich 7)
+    reminded_at = models.DateTimeField(
+        "Eslatma yuborilgan",
+        null=True,
+        blank=True,
+        db_index=True,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

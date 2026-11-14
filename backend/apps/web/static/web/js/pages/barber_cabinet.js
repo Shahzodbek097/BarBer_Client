@@ -2,7 +2,18 @@
  * Profil yo'q bo'lsa (404) — onboarding formasi ko'rinadi.
  */
 
-import { api, closeModal, el, fmtDate, fmtPrice, fmtTime, openModal, statusTag, toast } from "../api.js";
+import {
+  api,
+  closeModal,
+  downloadFile,
+  el,
+  fmtDate,
+  fmtPrice,
+  fmtTime,
+  openModal,
+  statusTag,
+  toast,
+} from "../api.js";
 import { redirectIfNotRole, wsReload } from "./common.js";
 
 const $ = (id) => document.getElementById(id);
@@ -20,6 +31,7 @@ function init() {
   $("status-switch").addEventListener("change", toggleStatus);
   $("reload-btn").addEventListener("click", loadIncoming);
   $("m-save").addEventListener("click", manualBooking);
+  $("export-btn").addEventListener("click", exportToday);
   $("today-chip").addEventListener("click", () => {
     dayFilter = dayFilter ? "" : new Date().toISOString().slice(0, 10);
     $("today-chip").classList.toggle("active", Boolean(dayFilter));
@@ -53,6 +65,19 @@ async function boot() {
 }
 
 /* --- Onboarding --- */
+
+async function exportToday() {
+  $("export-error").classList.add("hidden");
+  const day = new Date().toISOString().slice(0, 10);
+  try {
+    await downloadFile("barber/report/", { day, format: "xlsx" }, `barber-report-${day}.xlsx`);
+    toast("Hisobot yuklab olindi", "ok");
+  } catch (err) {
+    const box = $("export-error");
+    box.textContent = err.message;
+    box.classList.remove("hidden");
+  }
+}
 
 async function createProfile() {
   $("ob-error").classList.add("hidden");

@@ -3,6 +3,9 @@
 /* `hidden` atributi CSS display qoidalaridan kuchli bo'lishi kerak */
 [hidden] { display: none !important; }
 
+/* Ulanish kodi (Telegram kartasi) */
+.code-line { font-size: 22px; font-weight: 700; letter-spacing: 3px; display: inline-block; margin-right: 8px; }
+
 :root {
   --bg: #f2f4f7;
   --card: #ffffff;

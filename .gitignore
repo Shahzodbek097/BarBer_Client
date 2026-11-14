@@ -34,3 +34,7 @@ Thumbs.db
 
 # Docker volumes
 docker/pgdata/
+
+# Celery Beat jadval fayli (runtime)
+celerybeat-schedule
+celerybeat-schedule.db

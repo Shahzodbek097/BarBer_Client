@@ -18,6 +18,13 @@
     <section id="salon-list" class="stack mt"></section>
     <p id="empty" class="empty hidden">Salonlar yo'q.</p>
   </div>
+
+  <div class="card mt">
+    <h2>Hisobot</h2>
+    <p class="muted">Salonlar bo'yicha oylik umumiy hisobot Excel faylida.</p>
+    <button id="export-btn" class="btn btn-sm">⬇ Excel (bu oy)</button>
+    <p id="export-error" class="error-text hidden"></p>
+  </div>
 </div>
 {% endblock %}
 {% block scripts %}<script type="module" src="{% static 'web/js/pages/panel.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

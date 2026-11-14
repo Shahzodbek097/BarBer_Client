@@ -7,6 +7,11 @@ Barcha REST endpointlar shu yerda to'planadi (auth bundan tashqari —
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 
+from apps.analytics.api.views import (
+    AdminReportView,
+    BarberDailyReportView,
+    SalonReportView,
+)
 from apps.barbers.api.views import (
     BarberProfileView,
     BarberServiceViewSet,
@@ -20,6 +25,7 @@ from apps.bookings.api.views import BookingViewSet
 from apps.notifications.api.views import NotificationViewSet
 from apps.reviews.api.views import BarberReviewsView, ReviewCreateView
 from apps.salons.api.views import SalonBarbersView, SalonProfileView
+from apps.telegram.api.views import TelegramLinkView
 from config.api_admin import (
     AdminSalonApproveView,
     AdminSalonBlockView,
@@ -43,6 +49,12 @@ custom_urls = [
     path("barber/profile/", BarberProfileView.as_view()),
     path("barber/schedule/", WeekScheduleView.as_view()),
     path("barber/status/", BarberStatusView.as_view()),
+    # Hisobotlar (bosqich 7)
+    path("barber/report/", BarberDailyReportView.as_view()),
+    path("salon/report/", SalonReportView.as_view()),
+    path("admin/report/", AdminReportView.as_view()),
+    # Telegram chat bog'lash (bosqich 7)
+    path("telegram/link/", TelegramLinkView.as_view()),
     # Salon egasi
     path("salon/profile/", SalonProfileView.as_view()),
     path("salon/barbers/", SalonBarbersView.as_view()),

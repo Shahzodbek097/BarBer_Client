@@ -1,6 +1,6 @@
 /* `/salon/` — salon egasi kabineti: profil tahriri + o'z sartaroshlari. */
 
-import { api, el, toast } from "../api.js";
+import { api, downloadFile, el, toast } from "../api.js";
 import { redirectIfNotRole, wsReload } from "./common.js";
 
 const $ = (id) => document.getElementById(id);
@@ -16,7 +16,27 @@ init();
 function init() {
   if (!redirectIfNotRole(["salon_admin"])) return;
   document.addEventListener("bb:notify", wsReload(loadBarbers));
+  $("export-btn").addEventListener("click", exportMonth);
   boot();
+}
+
+async function exportMonth() {
+  $("export-error").classList.add("hidden");
+  const now = new Date();
+  const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  const to = now.toISOString().slice(0, 10);
+  try {
+    await downloadFile(
+      "salon/report/",
+      { from, to, format: "xlsx" },
+      `salon-report-${from}_${to}.xlsx`
+    );
+    toast("Hisobot yuklab olindi", "ok");
+  } catch (err) {
+    const box = $("export-error");
+    box.textContent = err.message;
+    box.classList.remove("hidden");
+  }
 }
 
 async function boot() {

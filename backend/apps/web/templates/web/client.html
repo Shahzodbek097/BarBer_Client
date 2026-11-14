@@ -15,6 +15,16 @@
   <section id="booking-list" class="grid"></section>
   <p id="empty" class="empty hidden">Navbatlar yo'q — katalogdan tanlab oling.</p>
   <p class="muted mt"><a href="/">← Katalogga qaytish</a></p>
+
+  <section id="tg-card" class="card mt">
+    <h3>Telegram eslatmalari</h3>
+    <p id="tg-status" class="muted">Tekshirilmoqda...</p>
+    <button id="tg-code-btn" class="btn btn-sm">Ulanish kodi olish</button>
+    <p id="tg-code-box" class="mt hidden">
+      <span class="code-line" id="tg-code"></span>
+      <span class="muted" id="tg-instruction"></span>
+    </p>
+  </section>
 </div>
 {% endblock %}
 {% block scripts %}<script type="module" src="{% static 'web/js/pages/client.js' %}?v={{ STATIC_VERSION }}"></script>{% endblock %}

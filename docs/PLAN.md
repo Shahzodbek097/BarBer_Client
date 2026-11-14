@@ -242,3 +242,42 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Natija: **364 test yashil** (20 sahifa smoke test: har page 200 + xatolar),
   coverage **99%**; gate — US-1…US-7 UI'da to'liq, responsive 3 ko'rsatgich,
   WS push ishlaydi — bajarildi
+
+### Bosqich 7 — Hisobotlar, Telegram bot, eslatmalar ✅
+- **`apps/analytics`** — hisobotlar (bookings FAQAT o'qiydi):
+  `services/reports.py` (`barber_daily` — kunlik ro'yxat + holat kesimi +
+  daromad, `salon_period` / `admin_period` — davriy, guruhlangan); daromad =
+  bandlov paytida muzlatilgan `price`, faqat COMPLETED (bekor/rad qilinganlar
+  pul emas); rol izolyatsiyasi: sartarosh o'zi, salon egasi o'z saloni,
+  super admin hammasi
+- **Excel eksport**: `services/xlsx.py` (openpyxl) + `XLSXRenderer` — DRF
+  `?format=xlsx` muzokarasidan o'tkazadi (mos renderer bo'lmasa DRF Http404
+  ko'taradi); `/api/v1/barber/report/`, `/api/v1/salon/report/`,
+  `/api/v1/admin/report/` — JSON yoki xlsx (bo'sh ajratgich + "Jami" qatori)
+- **`apps/telegram`** (yangi app): `TelegramChat` (user↔chat 1:1) va `LinkCode`
+  (6 xonali, 15 daqiqa umr); oqim: kabinet POST `/api/v1/telegram/link/` →
+  foydalanuvchi botga `/start KOD` → webhook chatni bog'laydi
+- **Webhook**: `/telegram/webhook/<secret>/` — `X-Telegram-Bot-Api-Secret-Token`
+  sarlavhasi bilan himoyalangan (bo'sh/mos kelmagan → 403); bot adapterlari:
+  `ConsoleBot` (token bo'lmasa logga yozadi) / `HttpBot` (api.telegram.org)
+- **Notification → Telegram ko'prik**: `TelegramConfig.ready()` ichida
+  `post_save` signal (telegram → notifications import yo'nalishi qonuniy);
+  SYSTEM turi tashlab yuboriladi; barcha navbat xabarlari bog'langan chatga
+  ketadi, xato asosiy oqimni buzmaydi (faqat log)
+- **Eslatmalar**: `send_reminders_for(day)` — tasdiqlangan va `reminded_at`
+  bo'sh navbatlar; chat bor → Telegram (`notify()` ko'prigi orqali), chat
+  yo'q → SMS fallback (`accounts/services/sms.py` adapteri); idempotentlik —
+  `Appointment.reminded_at` (migratsiya `bookings.0002`); Celery Beat har kuni
+  09:00 (`apps.telegram.send_reminders`, compose'da `worker --beat`) +
+  `manage.py send_reminders` (qo'lda / dev)
+- **UI**: mijoz kabinetida "Telegram eslatmalari" kartasi (holat + kod olish,
+  `.code-line`), sartarosh/salon/panel kabinetlarida Excel eksport tugmalari
+  (`api.js downloadFile` — JWT bilan blob yuklab olish, 401 refresh bilan)
+- **E2E isboti (haqiqiy HTTP)**: kabinetdan kod olish (kod 163585) → webhook
+  `/start KOD` → chat bog'landi ("✅ Ulashdi, Ali Mijoz!") → navbat tasdiqlash
+  → Telegram'ga "💈 Navbat tasdiqlandi" ketdi → `send_reminders`: bog'langan
+  Ali'ga Telegram eslatma, chat'siz Bekzod'ga SMS fallback (console log) →
+  Excel hisobot HTTP orqali yuklab olindi (openpyxl bilan qatorlar tekshirildi)
+- Natija: **404 test yashil**, coverage **99%** (telegram va analytics
+  modullarida ~100%); gate — zanjir (navbat→tasdiq→eslatma), Excel eksport,
+  SMS fallback — bajarildi

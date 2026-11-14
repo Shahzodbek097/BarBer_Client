@@ -32,7 +32,9 @@ function init() {
   });
 
   document.addEventListener("bb:notify", wsReload(load));
+  $("tg-code-btn").addEventListener("click", requestTelegramCode);
   load();
+  loadTelegram();
 }
 
 async function load() {
@@ -84,6 +86,30 @@ function bookingCard(booking) {
   card.querySelector('[data-act="reschedule"]')?.addEventListener("click", () => rescheduleModal(booking));
   card.querySelector('[data-act="review"]')?.addEventListener("click", () => reviewModal(booking));
   return card;
+}
+
+/* --- Telegram eslatmalari (bosqich 7) --- */
+
+async function loadTelegram() {
+  try {
+    const data = await api("telegram/link/");
+    $("tg-status").textContent = data.linked
+      ? `✅ Ulangan (@${data.username || data.bot_username}) — eslatmalar Telegram'ga keladi.`
+      : `Bog'lanmagan — navbat eslatmalari SMS bilan keladi. Telegram'ga ulansangiz, xabarlar tezroq va bepul keladi.`;
+  } catch {
+    $("tg-status").textContent = "Telegram holatini olishning imkoni bo'lmadi.";
+  }
+}
+
+async function requestTelegramCode() {
+  try {
+    const data = await api("telegram/link/", { method: "POST" });
+    $("tg-code").textContent = data.code;
+    $("tg-instruction").textContent = `— 15 daqiqa ichida @${data.bot_username || "BarBerNavbatBot"} botiga /start ${data.code} yuboring.`;
+    $("tg-code-box").classList.remove("hidden");
+  } catch (err) {
+    toast(err.message, "err");
+  }
 }
 
 /* --- Bekor qilish --- */

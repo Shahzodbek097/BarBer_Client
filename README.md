@@ -103,7 +103,7 @@ curl -X POST http://localhost:8000/api/v1/auth/register/ \
 - [x] **Bosqich 4** — Asosiy biznes mantiq (slot dvigateli, navbat tsikli) ✅ (224 test, race-test OK)
 - [x] **Bosqich 5** — API va backend (REST + WebSocket) ✅ (334 test, coverage 99%, Swagger + WS push ishlaydi)
 - [x] **Bosqich 6** — Frontend va dizayn ✅ (364 test, coverage 99%, responsive 360/768/1440, WS push jonli isbotlandi)
-- [ ] Bosqich 7 — Hisobotlar, Telegram bot, eslatmalar
+- [x] **Bosqich 7** — Hisobotlar, Telegram bot, eslatmalar ✅ (404 test, coverage 99%, Excel eksport + Telegram zanjiri + SMS fallback e2e isbotlandi)
 - [ ] Bosqich 8 — Test va xavfsizlik
 - [ ] Bosqich 9 — Docker va production deploy
 - [ ] Bosqich 10 — Hujjatlashtirish

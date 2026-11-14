@@ -1,6 +1,6 @@
 /* `/panel/` — super admin: statistika + salon moderatsiyasi. */
 
-import { api, el, toast } from "../api.js";
+import { api, downloadFile, el, toast } from "../api.js";
 import { redirectIfNotRole, wsReload } from "./common.js";
 
 const $ = (id) => document.getElementById(id);
@@ -19,6 +19,7 @@ function init() {
   if (!redirectIfNotRole(["superadmin"])) return;
   $("panel-app").classList.remove("hidden");
 
+  $("export-btn").addEventListener("click", exportMonth);
   $("salon-tabs").querySelectorAll("[data-status]").forEach((chip) => {
     chip.addEventListener("click", () => {
       statusFilter = chip.dataset.status;
@@ -31,6 +32,25 @@ function init() {
   document.addEventListener("bb:notify", wsReload(loadSalons));
   loadStats();
   loadSalons();
+}
+
+async function exportMonth() {
+  $("export-error").classList.add("hidden");
+  const now = new Date();
+  const from = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-01`;
+  const to = now.toISOString().slice(0, 10);
+  try {
+    await downloadFile(
+      "admin/report/",
+      { from, to, format: "xlsx" },
+      `admin-report-${from}_${to}.xlsx`
+    );
+    toast("Hisobot yuklab olindi", "ok");
+  } catch (err) {
+    const box = $("export-error");
+    box.textContent = err.message;
+    box.classList.remove("hidden");
+  }
 }
 
 async function loadStats() {

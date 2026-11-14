@@ -9,6 +9,7 @@ from datetime import timedelta
 from pathlib import Path
 
 import environ
+from celery.schedules import crontab
 
 # backend/ papkasi
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -63,6 +64,7 @@ LOCAL_APPS = [
     "apps.notifications",
     "apps.reviews",
     "apps.analytics",
+    "apps.telegram",
     "apps.web",
 ]
 
@@ -131,6 +133,14 @@ CELERY_RESULT_BACKEND = env("REDIS_BROKER_URL")
 CELERY_TASK_ALWAYS_EAGER = False
 CELERY_TASK_ACKS_LATE = True
 
+# Kunlik eslatma jadvali (Bugun 09:00 — TIME_ZONE bo'yicha)
+CELERY_BEAT_SCHEDULE = {
+    "send-reminders-daily": {
+        "task": "apps.telegram.send_reminders",
+        "schedule": crontab(hour=9, minute=0),
+    },
+}
+
 # --- Internatsionalizatsiya ---
 LANGUAGE_CODE = "uz"
 TIME_ZONE = env("TIME_ZONE")
@@ -147,7 +157,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Statik fayl versiyasi (URL: ?v=...) — build qutisi yo'q, shuning uchun oddiy
 # versiya ko'tariladi bosqichlarda. Stage 9'da STATIC_ROOT + collectstatic.
-STATIC_VERSION = "11"
+STATIC_VERSION = "12"
 
 # --- Autentifikatsiya ---
 # Custom user: telefon = login identifikator (bosqich 2)
@@ -214,6 +224,10 @@ SMS_PROVIDER = env("SMS_PROVIDER", default="console")  # console | eskiz
 SMS_ESKIZ_EMAIL = env("SMS_ESKIZ_EMAIL", default="")
 SMS_ESKIZ_PASSWORD = env("SMS_ESKIZ_PASSWORD", default="")
 TELEGRAM_BOT_TOKEN = env("TELEGRAM_BOT_TOKEN", default="")
+# Bot username (kabinetda ko'rsatiladi), webhook maxfiy kaliti va kod umri
+TELEGRAM_BOT_USERNAME = env("TELEGRAM_BOT_USERNAME", default="BarBerNavbatBot")
+TELEGRAM_WEBHOOK_SECRET = env("TELEGRAM_WEBHOOK_SECRET", default="")
+TELEGRAM_LINK_TTL = 15 * 60  # ulanish kodi amri (sekund)
 
 # --- Logging ---
 LOGGING = {

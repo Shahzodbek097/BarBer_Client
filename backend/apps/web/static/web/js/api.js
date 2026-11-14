@@ -123,6 +123,35 @@ export async function api(path, { method = "GET", body, query } = {}) {
   return data;
 }
 
+/* Fayl yuklab olish (Excel hisobotlar uchun) — JWT bilan, blob sifatida */
+export async function downloadFile(path, query, filename) {
+  const fetchBlob = () => {
+    const headers = {};
+    if (accessToken()) headers["Authorization"] = `Bearer ${accessToken()}`;
+    return fetch(`/api/v1/${path.replace(/^\//, "")}${qs(query)}`, { headers });
+  };
+  let res = await fetchBlob();
+  if (res.status === 401 && accessToken()) {
+    try {
+      await refreshTokens();
+      res = await fetchBlob();
+    } catch {
+      /* pastda 401 sifatida ishlanadi */
+    }
+  }
+  if (!res.ok) {
+    throw new Error(`Yuklab olishning imkoni bo'lmadi (${res.status})`);
+  }
+  const blob = await res.blob();
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 3000);
+}
+
 /* --- UI yordamchilari --- */
 
 export function toast(message, type = "info") {
