@@ -281,3 +281,38 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Natija: **404 test yashil**, coverage **99%** (telegram va analytics
   modullarida ~100%); gate — zanjir (navbat→tasdiq→eslatma), Excel eksport,
   SMS fallback — bajarildi
+
+### Bosqich 8 — Test va xavfsizlik ✅
+- **IDOR testlar to'plami** (`apps/core/tests/test_idor.py`, 49 test):
+  navbat obyekt izolyatsiyasi (retrieve/cancel/reschedule/list — boshqa
+  mijozning navbati 404 va o'zgarmas), sartarosh amal izolyatsiyasi
+  (confirm/reject/propose/complete/no-show/cancel — boshqa sartarosh 404,
+  holat va taklif yozuvi o'zgarmas), xabarnoma izolyatsiyasi (detail/read/
+  list/unread-count), sartarosh kabineti (xizmat PATCH/DELETE, tanaffus,
+  dam olish kuni — 400 va o'zgarmas), salon izolyatsiyasi, admin 403
+  matritsasi (3 rol × 3+ endpoint), Telegram holat izolyatsiyasi,
+  12 endpoint autentifikatsiyasiz 401 — javoblar 404/403/400, hech qachon
+  boshqa obyekt haqida ma'lumot sizib chiqmaydi
+- **E2E 3 oqim** (`apps/core/tests/test_e2e_flows.py`, `e2e` marker):
+  US-1 anon katalog → ro'yxatdan o'tish (OTP) → navbat → sartarosh tasdiqlaydi
+  → mijoz holat + xabarnoma ko'radi; US-2 vaqt o'zgartirish → sartarosh taklifi
+  → bekor qilish (tarix ≥ 3); US-3 qo'lda yozish → tasdiq → bajarildi →
+  5 yulduzli sharh → kunlik hisobot daromadi 50 000 + katalogda reyting
+- **Yuk testi** (`scripts/load_test.py` — stdlib+requests, ThreadPoolExecutor):
+  8 endpoint (health, sahifalar, katalog API) × 20 parallel × 240 so'rov,
+  har endpoint uchun ort/p50/p95/p99, gate p95<500 ms; natija:
+  `runserver` (1 jarayon) p95 **516 ms** — qat'iy o'tmadi; dev compose
+  prod-shakliga o'tkazildi: `gunicorn config.asgi:application -k
+  uvicorn.workers.UvicornWorker -w 4` (WS saqlanadi — ASGI) → p95 **242 ms**
+  (throughput 53 → 154 req/s), xatolar 0 — gate bajarildi. Dastlabki
+  p95 44 ms (1 foydalanuvchi) — bottleneck server jarayonlari sonida edi,
+  ilova kodida emas (katalogda select_related/prefetch_related bor)
+- **pip-audit**: `requirements/base.txt` (kutubxonalar versiyalari bilan)
+  tekshirildi — **0 ma'lum zaiflik**; `gunicorn>=23`, `uvicorn[standard]>=0.30`
+  qo'shildi (asosiy talablar — prod'da ham kerak)
+- **WS smoke**: yangi serverda haqiqiy JWT bilan handshake OK
+  (`/ws/client/{id}/`), noto'g'ri token 403 rad etiladi (consumer
+  xatti-harakati to'g'ri)
+- Natija: **456 test yashil**, coverage **99%** (66/5170 qator), ruff toza,
+  yuk p95 242 ms, pip-audit 0 — gate: coverage ≥80% ✅, E2E 3 oqim ✅,
+  IDOR suite ✅, p95<500ms ✅, pip-audit toza ✅

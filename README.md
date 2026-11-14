@@ -65,6 +65,12 @@ python backend\manage.py runserver
 | `.venv\Scripts\python.exe -m pytest` (backend ichida) | Testlar |
 | `ruff check backend && ruff format --check backend` | Lint/format tekshiruvi |
 | `.venv\Scripts\python.exe backend\manage.py check` | Django sozlamalar tekshiruvi |
+| `.venv\Scripts\python.exe scripts\load_test.py --users 20 --requests 240` | Yuk testi (gate: p95 < 500 ms) |
+| `.venv\Scripts\python.exe -m pip_audit -r backend\requirements\base.txt` | Dependensiya zaiflik skaneri |
+
+> Dev `web` konteyneri prod-shaklida xizmat qiladi: `gunicorn` + 4 ta
+> `uvicorn` ASGI worker (WebSocket ishlaydi). `runserver` yagona jarayon
+> bo'lgani uchun yuk testi p95 516 ms chiqqan; gunicorn'da 242 ms.
 
 > **pytest** yoki `manage.py` buyruqlarini backend papkasidan ishga tushirish qulay:
 > `cd backend && ..\.venv\Scripts\python.exe -m pytest`
@@ -104,7 +110,7 @@ curl -X POST http://localhost:8000/api/v1/auth/register/ \
 - [x] **Bosqich 5** — API va backend (REST + WebSocket) ✅ (334 test, coverage 99%, Swagger + WS push ishlaydi)
 - [x] **Bosqich 6** — Frontend va dizayn ✅ (364 test, coverage 99%, responsive 360/768/1440, WS push jonli isbotlandi)
 - [x] **Bosqich 7** — Hisobotlar, Telegram bot, eslatmalar ✅ (404 test, coverage 99%, Excel eksport + Telegram zanjiri + SMS fallback e2e isbotlandi)
-- [ ] Bosqich 8 — Test va xavfsizlik
+- [x] **Bosqich 8** — Test va xavfsizlik ✅ (456 test, coverage 99%, IDOR 49 + E2E 3 oqim, yuk p95 242ms < 500ms, pip-audit 0 zaiflik)
 - [ ] Bosqich 9 — Docker va production deploy
 - [ ] Bosqich 10 — Hujjatlashtirish
 

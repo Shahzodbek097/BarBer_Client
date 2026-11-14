@@ -39,7 +39,9 @@ services:
       context: ..
       dockerfile: docker/web/Dockerfile.dev
     container_name: barber_web
-    command: sh -c "python manage.py migrate && python manage.py loaddata regions && python manage.py runserver 0.0.0.0:8000 --noreload"
+    # Bosqich 8: gunicorn + uvicorn worker'lar (ASGI, WS ishlaydi) — prod-shakli.
+    # runserver bitta jarayon: 20 parallel foydalanuvchida p95 516 ms chiqqan.
+    command: sh -c "python manage.py migrate && python manage.py loaddata regions && gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000"
     volumes:
       - ../backend:/app/backend
     ports:
