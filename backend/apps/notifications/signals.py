@@ -45,7 +45,7 @@ def on_appointment_created(sender, instance, created, **kwargs) -> None:
         ntype=NotificationType.BOOKING_NEW,
         title="Yangi navbat so'rovi",
         body=f"{instance.client.full_name} {_slot_text(instance)} ga navbat oldi.",
-        link=f"/barber/bookings/{instance.pk}",
+        link="/barber/",  # kabinet ro'yxatida yangi so'rov ko'rinadi
     )
 
 
@@ -66,7 +66,7 @@ def on_history_created(sender, instance, created, **kwargs) -> None:
                 ntype=NotificationType.BOOKING_RESCHEDULED,
                 title="Navbat vaqti o'zgartirildi",
                 body=f"Mijoz navbatni {_slot_text(appointment)} ga ko'chirdi.",
-                link=f"/barber/bookings/{appointment.pk}",
+                link="/barber/",
             )
         else:
             notify(
@@ -77,7 +77,7 @@ def on_history_created(sender, instance, created, **kwargs) -> None:
                     f"Sartarosh navbatni {_slot_text(appointment)} ga taklif qildi. "
                     f"{appointment.barber_reply}"
                 ),
-                link=f"/c/bookings/{appointment.pk}",
+                link="/c/",
             )
         return
 
@@ -89,7 +89,6 @@ def on_history_created(sender, instance, created, **kwargs) -> None:
         ntype=ntype,
         title=title,
         body=f"Navbat ({_slot_text(appointment)}) holati: {title.lower()}.",
-        link=f"/c/bookings/{appointment.pk}"
-        if not changed_by_client
-        else f"/barber/bookings/{appointment.pk}",
+        # Havolalar faqat MAVJUD sahifalarga: sartarosh kabineti / mijoz kabineti
+        link="/c/" if not changed_by_client else "/barber/",
     )

@@ -63,7 +63,7 @@ def send_reminders_for(day: date) -> int:
             ntype=NotificationType.BOOKING_REMINDER,
             title="Navbat eslatmasi",
             body=body,
-            link=f"/c/bookings/{appt.pk}",
+            link="/c/",  # mijoz kabineti (deep-link sahifalari yo'q)
         )
         Appointment.objects.filter(pk=appt.pk).update(reminded_at=timezone.now())
         sent += 1
