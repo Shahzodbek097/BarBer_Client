@@ -161,7 +161,11 @@ export function toast(message, type = "info") {
   el.className = `toast ${type === "ok" ? "ok" : type === "err" ? "err" : ""}`.trim();
   el.textContent = message;
   box.appendChild(el);
-  setTimeout(() => el.remove(), 4500);
+  // 4.5s'dan keyin .out (fade) — keyin DOM'dan olib tashlanadi
+  setTimeout(() => {
+    el.classList.add("out");
+    setTimeout(() => el.remove(), 320);
+  }, 4500);
 }
 
 export function el(html) {
