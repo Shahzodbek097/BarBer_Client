@@ -16,42 +16,73 @@ shaxsiy kabinetida navbatlarni boshqaradi va kunlik tahlilni ko'radi.
 ```
 BarBer_Client/
 ├── backend/            # Django (API + SSR)
-│   ├── config/         # settings/dev|test|prod, urls, asgi, celery
-│   ├── apps/           # 10 modul: core, accounts, salons, barbers, services,
-│   │                   # schedule, bookings, notifications, reviews, analytics
-│   └── requirements/   # base / dev / prod
-├── frontend/           # SPA kabinetlar (6-bosqichda)
-├── templates/          # SSR katalog sahifalari (6-bosqichda)
-├── docker/             # Dockerfile'lar va compose fayllar
-├── scripts/            # yordamchi skriptlar
-└── docs/               # hujjatlar (10-bosqichda to'ldiriladi)
+│   ├── config/         # settings/base|dev|test|prod, urls, asgi, celery, api_router
+│   └── apps/           # 12 modul: core, accounts, salons, barbers, services,
+│   │                   # schedule, bookings, notifications, reviews, analytics,
+│   │                   # telegram, web (UI — statik + template + JS)
+│   └── requirements/   # base / dev
+├── templates/          # SSR katalog sahifalari (root-level DIRS)
+├── docker/             # Dockerfile (dev/prod) va compose fayllar
+├── scripts/            # yuk testi, backup, restore drill, rollback
+└── docs/               # PLAN.md, ARCHITECTURE.md, DEPLOY.md
 ```
+
+Arxitektura qoidalar va oqimlar: **`docs/ARCHITECTURE.md`** ·
+Deploy/operatsiyalar: **`docs/DEPLOY.md`**
 
 ---
 
-## Tez boshlash
+## Yangi dasturchi testi — 30 daqiqada local ko'tarish
 
-### 1-usul: Docker orqali (tavsiya — 1 buyruq)
+**0) Talablar (5 daq):** Git, Python 3.11, Docker Desktop ishga tushgan.
+
+**1) Klone + env (2 daq):**
 
 ```bash
-cp .env.example .env            # Windows: copy .env.example .env
+git clone <repo-url> && cd BarBer_Client
+copy .env.example .env          # Windows; Linux/macOS: cp
+```
+
+**2) Dev stackni ko'tarish (10 daq — birinchi build pip yuklaydi):**
+
+```bash
 docker compose -f docker/docker-compose.dev.yml up -d --build
 ```
 
-→ http://localhost:8000/health/ — `{"status": "ok"}` qaytarsa, hammasi ishlayapti.
+Konteyner startda migratsiya + viloyat fixture'ini o'zi bajaradi.
 
-### 2-usul: Lokal (venv) + Docker'da faqat infrastruktura
+**3) Tekshirish ro'yxati (5 daq):**
+
+| Tekshiruv | Muvaffaqiyat |
+|---|---|
+| http://localhost:8000/health/ | `{"status": "ok"}` |
+| http://localhost:8000/ | Ochiq katalog: viloyat + salon kartalari |
+| http://localhost:8000/api/docs/ | Swagger ochiladi (barcha endpointlar) |
+| `docker compose -f docker/docker-compose.dev.yml logs web --tail 5` | gunicorn "Application startup complete" |
+
+**4) Testlar (10 daq — venv'siz, konteyner ichida):**
+
+```bash
+docker compose -f docker/docker-compose.dev.yml exec web python -m pytest -q
+```
+
+→ 456 test, 0 xato bo'lishi kerak (coverage uchun: `--cov=apps`).
+
+**5) Jonli oqimni sinash (8 daq):** Swagger'da `register/` → javobdagi
+`debug_code`ni (dev'da SMS console'ga yoziladi) `verify-otp/`ga yuboring →
+`access` token bilan `POST /bookings/` qiling.
+
+### Alternativ: host venv (Docker'siz pytest uchun)
 
 ```bash
 py -3.11 -m venv .venv
 .venv\Scripts\activate
 pip install -r backend/requirements/dev.txt
-copy .env.example .env
 
-docker compose -f docker/docker-compose.dev.yml up -d db redis   # faqat DB+Redis
-python backend\manage.py migrate
-python backend\manage.py loaddata regions      # 14 viloyat / 53 tuman
-python backend\manage.py runserver
+docker compose -f docker/docker-compose.dev.yml up -d db redis   # faqat infrastruktura
+cd backend
+python manage.py migrate && python manage.py loaddata regions
+python manage.py runserver          # yoki ..\..\.venv\Scripts\python.exe -m pytest
 ```
 
 ---
@@ -136,6 +167,6 @@ curl -X POST http://localhost:8000/api/v1/auth/register/ \
 - [x] **Bosqich 7** — Hisobotlar, Telegram bot, eslatmalar ✅ (404 test, coverage 99%, Excel eksport + Telegram zanjiri + SMS fallback e2e isbotlandi)
 - [x] **Bosqich 8** — Test va xavfsizlik ✅ (456 test, coverage 99%, IDOR 49 + E2E 3 oqim, yuk p95 242ms < 500ms, pip-audit 0 zaiflik)
 - [x] **Bosqich 9** — Docker va production deploy ✅ (prod stack + backup→restore drill 32 jadval mos + rollback skripti; gunicorn/uvicorn prod server)
-- [ ] Bosqich 10 — Hujjatlashtirish
+- [x] **Bosqich 10** — Hujjatlashtirish ✅ (ARCHITECTURE + DEPLOY kitobchasi, README "30 daqiqada" testi — frеsh clone'da jonli tekshirildi: health 43s, 456 test OK)
 
 Muallif: BarBer_Client jamoasi

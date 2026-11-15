@@ -371,3 +371,25 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Natija: prod stack lokal'da to'liq ishlaydi, backup→restore drill ✅
   (32 jadval mos, yangi stackda qayta tasdiqlandi), rollback skripti
   ikki rejimda ✅ — gate 3/3 bajarildi
+
+### Bosqich 10 — Hujjatlashtirish ✅
+- **`docs/ARCHITECTURE.md`** (yangi): qatlamli tuzilma (12 app),
+  import yo'nalishlari qoidasi, asosiy oqimlar (navbat mashinasi,
+  auth, Telegram zanjiri), tashqi adapterlar, Redis DB bo'linishi,
+  prod sxema, testlar va konventsiyalar
+- **`docs/DEPLOY.md`** (yangi): operatsion kitobcha — majburiy env
+  jadvali (`${VAR:?}` bilan), birinchi deploy, nginx TLS/WS proxy
+  misoli, zaxira cron + offsite eslatmasi, restore/drill, rollback
+  tartibi, monitoring (health/log/yuk testi), yangilanish tartibi
+- **README** qayta yozildi: tuzilma daraxti to'g'irlandi, "Yangi
+  dasturchi testi — 30 daqiqada" checklist (talablar → clone → stack →
+  tekshiruv ro'yxati → konteyner ichida pytest → jonli oqim), venv
+  alternativi, docs havolalari
+- **Gate jonli tekshirildi (frеsh clone)**: temp'ga `git clone` →
+  `compose up -d --build` → **build 24 s (cached) / health 43 s** →
+  home 200, Swagger 200 → konteyner ichida `pytest`: **456 test /
+  0 xato (69 s)** — 30 daqiqa budget'iga ancha vaqt yetadi
+  (birinchi build'da pip yuklashi bilan ham ~10 daq)
+- Insident yechimi qo'shildi: rollback drilllar working tree'ni detach
+  qilishi mumkin — `main`ga qaytish buyrug'i hujjatlashtirildi
+- Natija: gate — "Yangi dasturchi 30 daqiqada local ko'tarishi" ✅
