@@ -56,6 +56,9 @@ async function boot() {
     enterCabinet();
   } catch (err) {
     if (err.status === 404) {
+      // Profil yo'q — onboarding formasi. Eslatma: ota-div #barber-app ham
+      // hidden bo'lsa, forma ko'rinmaydi — undan ham olib tashlash shart.
+      $("barber-app").classList.remove("hidden");
       $("onboarding").classList.remove("hidden");
       $("guard").innerHTML = "";
     } else {

@@ -157,7 +157,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Statik fayl versiyasi (URL: ?v=...) — build qutisi yo'q, shuning uchun oddiy
 # versiya ko'tariladi bosqichlarda. Stage 9'da STATIC_ROOT + collectstatic.
-STATIC_VERSION = "12"
+STATIC_VERSION = "13"
 
 # --- Autentifikatsiya ---
 # Custom user: telefon = login identifikator (bosqich 2)
