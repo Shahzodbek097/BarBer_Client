@@ -354,5 +354,20 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Insident (yechilgan): Docker Desktop o'chib qaytganda dev stack
   to'xtagani aniqlandi (host 5432 yopiq → pytest ulanmadi); dev stack
   qayta ko'tarildi — dev/prod stacklari mustaqil ekanligi tasdiqlandi
-- Natija: prod stack lokal'da to'liq ishlaydi, backup→restore drill ✅,
-  rollback skripti ✅ — gate 3/3 bajarildi
+- **Compose project nomi insidenti (drill ochib berdi)**: ikkala compose
+  fayl bir xil default project nomi bilan ishlardi (fayl katalogidan
+  `docker` deb olingan) — prod `up` dev konteynerlarni o'z loyihasiga
+  qo'shib qayta yaratgan; natijada prod web parol mos kelmaganidan
+  crash-loop'ga tushgan. Yechim: har compose faylga o'z `name:`i
+  (`barber-dev` / `barber-prod`), dev web/celery'ga turg'un
+  `image: barber-web-dev` nomlari, dev `pgdata` volümi eski
+  `docker_pgdata`ga `name:` orqali bog'landi (ma'lumotlar yo'qolmadi —
+  9 user, Ali saqlangan). Prod drill ma'lumotlari tashlama —
+  `down -v` bilan tozalandi
+- Rollback drill ikki xil: guard-path (`--to HEAD~1` → compose fayli
+  eski commitda yo'q → build xato → **avtomatik oldingi holatga qaytadi**,
+  exit 1) va success-path (`--to last_deploy` → checkout → rebuild
+  (cached) → up → health 200 → exit 0) — ikkalasi ham tekshirildi
+- Natija: prod stack lokal'da to'liq ishlaydi, backup→restore drill ✅
+  (32 jadval mos, yangi stackda qayta tasdiqlandi), rollback skripti
+  ikki rejimda ✅ — gate 3/3 bajarildi

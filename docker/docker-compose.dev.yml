@@ -4,6 +4,10 @@
 # To'xtatish:
 #   docker compose -f docker/docker-compose.dev.yml down
 
+# Aloida project nomi — prod compose (barber-prod) bilan konteynerlarni
+# aralashtirmaslik uchun (default fayl nomi ikkalasida bir xil bo'lardi).
+name: barber-dev
+
 services:
   db:
     image: postgis/postgis:16-3.4
@@ -38,6 +42,7 @@ services:
     build:
       context: ..
       dockerfile: docker/web/Dockerfile.dev
+    image: barber-web-dev
     container_name: barber_web
     # Bosqich 8: gunicorn + uvicorn worker'lar (ASGI, WS ishlaydi) — prod-shakli.
     # runserver bitta jarayon: 20 parallel foydalanuvchida p95 516 ms chiqqan.
@@ -64,6 +69,7 @@ services:
     build:
       context: ..
       dockerfile: docker/web/Dockerfile.dev
+    image: barber-web-dev
     container_name: barber_celery
     # --beat: kunlik eslatma jadvali (bosqich 7) bir jarayonda
     command: celery -A config worker -l info --beat
@@ -85,3 +91,6 @@ services:
 
 volumes:
   pgdata:
+    # Project nomi o'zgargan (barber-dev) — eski ma'lumotlar volümiga
+    # bog'lanadi (Docker Desktop restart insidentidan keyin saqlangan)
+    name: docker_pgdata

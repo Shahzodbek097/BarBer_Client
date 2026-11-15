@@ -71,6 +71,11 @@ python backend\manage.py runserver
 > Dev `web` konteyneri prod-shaklida xizmat qiladi: `gunicorn` + 4 ta
 > `uvicorn` ASGI worker (WebSocket ishlaydi). `runserver` yagona jarayon
 > bo'lgani uchun yuk testi p95 516 ms chiqqan; gunicorn'da 242 ms.
+>
+> Compose project nomlari o'ziga xos: dev — `barber-dev`, prod —
+> `barber-prod` (default nom ularni aralashtirib yuborar edi). Dev
+> `pgdata` volümi `docker_pgdata` (eski nom) ga bog'langan — ma'lumotlar
+> saqlanadi.
 
 ### Production (bosqich 9)
 

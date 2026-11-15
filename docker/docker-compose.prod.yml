@@ -12,6 +12,10 @@
 # To'xtatish: docker compose -f docker/docker-compose.prod.yml down
 # (volümlar saqlanadi; o'chirish uchun: down -v)
 
+# Aloida project nomi — dev compose (barber-dev) bilan konteynerlarni
+# aralashtirmaslik uchun (default fayl nomi ikkalasida bir xil bo'lardi).
+name: barber-prod
+
 x-backend-env: &backend-env
   DJANGO_SETTINGS_MODULE: config.settings.prod
   SECRET_KEY: ${SECRET_KEY:?SECRET_KEY majburiy (50+ tasodifiy belgi)}
