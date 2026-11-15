@@ -6,7 +6,7 @@ Ishga tushirish: DJANGO_SETTINGS_MODULE=config.settings.prod
 from django.core.exceptions import ImproperlyConfigured
 
 from .base import *  # noqa: F401, F403
-from .base import BASE_DIR, SECRET_KEY, env
+from .base import BASE_DIR, MIDDLEWARE, SECRET_KEY, env
 
 DEBUG = False
 
@@ -20,14 +20,33 @@ if not ALLOWED_HOSTS:
     raise ImproperlyConfigured("Production'da ALLOWED_HOSTS o'rnatilishi shart.")
 
 # --- Transport xavfsizligi ---
-SECURE_SSL_REDIRECT = True
+# TLS reverse proxy ortida ishlaydi (proxy X-Forwarded-Proto yuboradi)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# Lokal HTTP drill (TLS'siz konteyner) uchun o'chiriladi; domain'da True
+SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)
 SECURE_HSTS_SECONDS = 31_536_000  # 1 yil
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_REFERRER_POLICY = "same-origin"
+SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+
+# --- Statik fayllar: whitenoise (collectstatic → gzip) ---
+MIDDLEWARE = [
+    *MIDDLEWARE[:1],
+    "whitenoise.middleware.WhiteNoiseMiddleware",  # SecurityMiddleware'dan keyin
+    *MIDDLEWARE[1:],
+]
+STORAGES = {
+    # default — FileField (salon suratlari); uni yo'qotib qo'ymaslik shart
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        # Manifest emas — cache-busting ?v=<STATIC_VERSION> bilan (web context)
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 # --- Logging: konsol + aylanadigan fayl ---
 LOGS_DIR = BASE_DIR / "logs"

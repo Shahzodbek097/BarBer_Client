@@ -38,3 +38,6 @@ docker/pgdata/
 # Celery Beat jadval fayli (runtime)
 celerybeat-schedule
 celerybeat-schedule.db
+
+# Zaxira fayllari va deploy yozuvlari (runtime)
+backups/

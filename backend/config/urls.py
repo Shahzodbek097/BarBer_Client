@@ -3,6 +3,7 @@
 Bosqich 5: REST router (`config.api_router`), Swagger sxemasi va WS.
 """
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
@@ -21,3 +22,17 @@ urlpatterns = [
     path("", include("apps.web.urls")),
     path("", include("apps.core.urls")),
 ]
+
+# Prod (DEBUG=False): whitenoise faqat STATIC xizmatlaydi — MEDIA (salon
+# suratlari) uchun Django'ning oddiy serve fallback'i (kichik hajm uchun
+# yetarli; yuk ortsa nginx/caddy old panelga o'tkaziladi).
+if not settings.DEBUG:
+    from django.views.static import serve as media_serve
+
+    urlpatterns += [
+        path(
+            "media/<path:path>",
+            media_serve,
+            {"document_root": settings.MEDIA_ROOT},
+        ),
+    ]

@@ -18,3 +18,5 @@ openpyxl>=3.1
 # ASGI server (bosqich 8: yuk testi prod-shaklida; bosqich 9: deploy)
 gunicorn>=23.0
 uvicorn[standard]>=0.30
+# Statik fayllarni ilova jarayonidan xizmatlash (bosqich 9: prod, nginx'siz)
+whitenoise>=6.7

@@ -1,0 +1,26 @@
+# BarBer_Client — PROD image (bosqich 9)
+# Dev'dan farqi: faqat base.txt (test/lint kutubxonalarisiz), statik fayllar
+# build vaqtida yig'iladi (whitenoise), CMD — gunicorn ASGI server.
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app/backend
+
+# Avval talablar (qatlam keshi uchun ajratilgan)
+COPY backend/requirements/ /app/backend/requirements/
+RUN pip install --no-cache-dir -r requirements/base.txt
+
+COPY . /app/
+
+# Statik fayllarni build vaqtida yig'ish (whitenoise image ichidan xizmatlaydi).
+# Dummy SECRET_KEY/ALLOWED_HOSTS — faqat settings validatsiyasidan o'tish uchun;
+# runtime'da haqiqiy qiymatlar compose env'dan keladi.
+RUN SECRET_KEY=build-time-collectstatic-dummy ALLOWED_HOSTS=localhost \
+    DJANGO_SETTINGS_MODULE=config.settings.prod \
+    python manage.py collectstatic --noinput
+
+EXPOSE 8000
+
+CMD ["gunicorn", "config.asgi:application", "-k", "uvicorn.workers.UvicornWorker", "-w", "4", "-b", "0.0.0.0:8000"]

@@ -72,6 +72,25 @@ python backend\manage.py runserver
 > `uvicorn` ASGI worker (WebSocket ishlaydi). `runserver` yagona jarayon
 > bo'lgani uchun yuk testi p95 516 ms chiqqan; gunicorn'da 242 ms.
 
+### Production (bosqich 9)
+
+```powershell
+# Repo ildizidan — majburiy sirlar bilan:
+$env:SECRET_KEY = "<50+ tasodifiy belgi>"
+$env:POSTGRES_PASSWORD = "<kuchli parol>"
+$env:ALLOWED_HOSTS = "<domain yoki localhost>"
+docker compose -f docker/docker-compose.prod.yml up -d --build
+
+# Operatsiyalar (repo ildizidan):
+python scripts/backup_db.py                 # pg_dump → backups/*.dump (14 ta saqlanadi)
+python scripts/restore_drill.py --latest    # zaxira → scratch DB → jadval satrlari solishtirish
+python scripts/rollback.py --record         # deploy paytida hozirgi SHA yoziladi
+python scripts/rollback.py --to last_deploy # muammo bo'lsa: oldingi deploy'ga qaytish
+```
+
+TLS reverse proxy ortida: proxy `X-Forwarded-Proto: https` yuboradi,
+`SECURE_SSL_REDIRECT` default 1 (lokal HTTP drill'da `0` beriladi).
+
 > **pytest** yoki `manage.py` buyruqlarini backend papkasidan ishga tushirish qulay:
 > `cd backend && ..\.venv\Scripts\python.exe -m pytest`
 
@@ -111,7 +130,7 @@ curl -X POST http://localhost:8000/api/v1/auth/register/ \
 - [x] **Bosqich 6** — Frontend va dizayn ✅ (364 test, coverage 99%, responsive 360/768/1440, WS push jonli isbotlandi)
 - [x] **Bosqich 7** — Hisobotlar, Telegram bot, eslatmalar ✅ (404 test, coverage 99%, Excel eksport + Telegram zanjiri + SMS fallback e2e isbotlandi)
 - [x] **Bosqich 8** — Test va xavfsizlik ✅ (456 test, coverage 99%, IDOR 49 + E2E 3 oqim, yuk p95 242ms < 500ms, pip-audit 0 zaiflik)
-- [ ] Bosqich 9 — Docker va production deploy
+- [x] **Bosqich 9** — Docker va production deploy ✅ (prod stack + backup→restore drill 32 jadval mos + rollback skripti; gunicorn/uvicorn prod server)
 - [ ] Bosqich 10 — Hujjatlashtirish
 
 Muallif: BarBer_Client jamoasi

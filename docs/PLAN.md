@@ -316,3 +316,43 @@ Throttling (login 5/min) • HTTPS/HSTS/CORS • Audit log • O'zR shaxsiy ma'l
 - Natija: **456 test yashil**, coverage **99%** (66/5170 qator), ruff toza,
   yuk p95 242 ms, pip-audit 0 — gate: coverage ≥80% ✅, E2E 3 oqim ✅,
   IDOR suite ✅, p95<500ms ✅, pip-audit toza ✅
+
+### Bosqich 9 — Docker va production deploy ✅
+- **Prod stack** (`docker/docker-compose.prod.yml`): postgis-16 db +
+  redis + web (gunicorn + 4 uvicorn ASGI worker, bosqich 8'da sinovdan
+  o'tgan) + celery worker va beat **alohida** konteynerlarda (prod amaliyoti),
+  hammasi `restart: unless-stopped` + healthcheck bilan; media volume;
+  majburiy `SECRET_KEY`/`POSTGRES_PASSWORD` `${VAR:?}` bilan tekshiriladi,
+  redis hostga umuman ochilmagan
+- **Prod image** (`docker/web/Dockerfile.prod`): faqat `base.txt`
+  (test/lint kutubxonalarisiz), `collectstatic` build vaqtida,
+  CMD — gunicorn; `.dockerignore` — **`.env` image'ga tushmaydi** (sirlar
+  faqat compose env orqali), `.git/.venv/backups` ham chiqariladi
+- **`prod.py` kengaytirildi**: whitenoise (STORAGES ikkalasi — `default`
+  FileField + `staticfiles` Compressed), `SECURE_PROXY_SSL_HEADER`,
+  `SECURE_SSL_REDIRECT` env orqali (domain'da True, lokal HTTP drill'da 0),
+  `SECURE_CONTENT_TYPE_NOSNIFF`; media (salon suratlari) DEBUG=False'da
+  Django serve fallback (`config/urls.py`) — yuk ortsa nginx'ga o'tkaziladi
+- **Prod URL drill (lokal 8001)**: migrate 42 migratsiya + regions fixture
+  (67 obyekt) → `health` 200, `/` 200, whitenoise statik 200
+  (`max-age=60, public`), regions API 14 viloyat, Swagger 200, media
+  routing (404 to'g'ri), **WS handshake OK** (prod konteynerida JWT bilan),
+  superadmin yaratildi + admin ga kirish yo'li ochildi
+- **`check --deploy`**: 27 xabar — 26 drf-spectacular sxema-hintlari
+  (kosmetik, bosqich 5'dan) + W008 (SSL redirect 0 — faqat lokal drill'da;
+  real domain'da default True) — HSTS, cookie'lar, nosniff toza
+- **Backup** (`scripts/backup_db.py`): `pg_dump -Fc` → `backups/*.dump`
+  (118 KB), eski zaxiralar 14 tagacha saqlanadi
+- **Restore drill** (`scripts/restore_drill.py`): dump → yangi scratch
+  bazaga pg_restore → **32 jadval satr sonlari manba ↔ tiklangan — hammasi
+  mos** (O'TDI ✅); psql `DROP DATABASE` tranzaksiya blokidagi nuansa
+  alohida `-c` chaqiruvlari bilan tuzatildi
+- **Rollback** (`scripts/rollback.py`): `--record` (deploy SHA'ni yozadi),
+  `--to <sha|tag|HEAD~1|last_deploy>` (checkout → rebuild → up → health),
+  `--db-rollback APP MIGRATSIYA` (migratsiyani orqaga), build muvaffaqiyatsiz
+  bo'lsa avtomatik oldingi holatga qaytadi
+- Insident (yechilgan): Docker Desktop o'chib qaytganda dev stack
+  to'xtagani aniqlandi (host 5432 yopiq → pytest ulanmadi); dev stack
+  qayta ko'tarildi — dev/prod stacklari mustaqil ekanligi tasdiqlandi
+- Natija: prod stack lokal'da to'liq ishlaydi, backup→restore drill ✅,
+  rollback skripti ✅ — gate 3/3 bajarildi

@@ -1,18 +1,22 @@
-.git
-.venv
-venv
-__pycache__
-*.pyc
+# Sirlar — image'ga TUSHMASIN (compose env orqali beriladi)
 .env
-.env.local
-.pytest_cache
-.ruff_cache
+.env.prod
+
+# Git va lokat kutubxonalar
+.git/
+.venv/
+.idea/
+.ruff_cache/
+__pycache__/
+*.pyc
+
+# Build/runtime artefaktlari (image ichida collectstatic o'zi yig'adi)
+backend/staticfiles/
+backend/logs/
+backups/
+docker/pgdata/
+
+# Vazncha fayllar (test output)
+.pytest_cache/
+htmlcov/
 .coverage
-htmlcov
-logs
-media
-staticfiles
-node_modules
-docs
-.github
-scripts

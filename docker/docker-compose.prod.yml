@@ -1,0 +1,121 @@
+# BarBer_Client — PRODUCTION stack (bosqich 9)
+#
+# Ishga tushirish (repo ildizidan, majburiy env'lar bilan):
+#   $env:SECRET_KEY="<50+ tasodifiy belgi>"; $env:POSTGRES_PASSWORD="<kuchli>"
+#   $env:ALLOWED_HOSTS="<domain>,<ip>"; $env:WEB_PORT="8000"
+#   docker compose -f docker/docker-compose.prod.yml up -d --build
+#
+# Lokal HTTP drill (TLS'siz): SECURE_SSL_REDIRECT=0, ALLOWED_HOSTS=localhost,
+# WEB_PORT=8001 (dev stack 8000'da turadi). Haqiqiy domain'da TLS reverse
+# proxy (caddy/nginx) ortida ishlaydi — proxy X-Forwarded-Proto yuboradi.
+#
+# To'xtatish: docker compose -f docker/docker-compose.prod.yml down
+# (volümlar saqlanadi; o'chirish uchun: down -v)
+
+x-backend-env: &backend-env
+  DJANGO_SETTINGS_MODULE: config.settings.prod
+  SECRET_KEY: ${SECRET_KEY:?SECRET_KEY majburiy (50+ tasodifiy belgi)}
+  ALLOWED_HOSTS: ${ALLOWED_HOSTS:-localhost}
+  DATABASE_URL: postgres://barber:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD majburiy}@db:5432/barber_client
+  REDIS_URL: redis://redis:6379/0
+  REDIS_BROKER_URL: redis://redis:6379/1
+  REDIS_CHANNEL_URL: redis://redis:6379/2
+  # TLS proxy ortida True (default); lokal HTTP drill'da 0
+  SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-1}
+  # SMS / Telegram adapterlari (prod: eskiz + bot token)
+  SMS_PROVIDER: ${SMS_PROVIDER:-console}
+  SMS_ESKIZ_EMAIL: ${SMS_ESKIZ_EMAIL:-}
+  SMS_ESKIZ_PASSWORD: ${SMS_ESKIZ_PASSWORD:-}
+  TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
+  TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_USERNAME:-}
+  TELEGRAM_WEBHOOK_SECRET: ${TELEGRAM_WEBHOOK_SECRET:-}
+
+services:
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: barber_prod_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: barber_client
+      POSTGRES_USER: barber
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD majburiy}
+    volumes:
+      - pgdata_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U barber -d barber_client"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  redis:
+    image: redis:7-alpine
+    container_name: barber_prod_redis
+    restart: unless-stopped
+    # Faqat ichki tarmoq — hostga port ochilmaydi
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: ..
+      dockerfile: docker/web/Dockerfile.prod
+    image: barber-web-prod
+    container_name: barber_prod_web
+    restart: unless-stopped
+    # Migratsiya + viloyat fixture'i bir marta; keyin gunicorn
+    command: sh -c "python manage.py migrate --noinput && python manage.py loaddata regions && exec gunicorn config.asgi:application -k uvicorn.workers.UvicornWorker -w 4 -b 0.0.0.0:8000"
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    volumes:
+      # Media (salon suratlari) — image qatlamida emas, volümda
+      - media_prod:/app/backend/media
+    environment: *backend-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/', timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  worker:
+    image: barber-web-prod
+    container_name: barber_prod_worker
+    restart: unless-stopped
+    command: celery -A config worker -l info
+    environment: *backend-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A config inspect ping -d celery@$$HOSTNAME || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  beat:
+    image: barber-web-prod
+    container_name: barber_prod_beat
+    restart: unless-stopped
+    # Kunlik eslatma jadvali (09:00) — alohida jarayon (prod amaliyoti)
+    command: celery -A config beat -l info
+    environment: *backend-env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata_prod:
+  media_prod:
